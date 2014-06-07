@@ -1,15 +1,15 @@
 /********************************************************************
 * Description:  encoder.c
-*               This file, 'encoder.c', is a HAL component that 
-*               provides software based counting of quadrature 
+*               This file, 'encoder.c', is a HAL component that
+*               provides software based counting of quadrature
 *               encoder signals.
 *
 * Author: John Kasunich
 * License: GPL Version 2
-*    
+*
 * Copyright (c) 2003 All rights reserved.
 *
-* Last change: 
+* Last change:
 ********************************************************************/
 /** This file, 'encoder.c', is a HAL component that provides software
     based counting of quadrature encoder signals.  The maximum count
@@ -129,9 +129,11 @@ typedef struct {
     hal_float_t *pos_latch;     /* c:w scaled latched position (floating point) */
     hal_float_t *vel;		/* c:w scaled velocity (floating point) */
     hal_float_t *pos_scale;	/* c:r pin: scaling factor for pos */
+    hal_float_t *ext_angle;	/* c:r pin: scaling factor for pos */
     hal_bit_t old_latch;        /* value of latch on previous cycle */
     double old_scale;		/* c:rw stored scale value */
     double scale;		/* c:rw reciprocal value used for scaling */
+    double ext_angle_offset;
     int counts_since_timeout;	/* c:rw used for velocity calcs */
 } counter_t;
 
@@ -204,13 +206,7 @@ int rtapi_app_main(void)
     if(num_chan) {
         howmany = num_chan;
     } else {
-        howmany = 0;
-        for (i = 0; i < MAX_CHAN; i++) {
-            if (names[i] == NULL) {
-                break;
-            }
-            howmany = i + 1;
-        }
+        for(i=0; names[i]; i++) {howmany = i+1;}
     }
 
     /* test for number of channels */
@@ -281,6 +277,7 @@ int rtapi_app_main(void)
 	cntr->old_scale = 1.0;
 	cntr->scale = 1.0;
 	cntr->counts_since_timeout = 0;
+	cntr->ext_angle_offset =0.0;
     }
     /* export functions */
     retval = hal_export_funct("encoder.update-counters", update,
@@ -507,7 +504,14 @@ static void capture(void *arg, long period)
 	/* add interpolation value */
 	delta_time = timebase - cntr->timestamp;
 	interp = *(cntr->vel) * (delta_time * 1e-9);
-	*(cntr->pos_interp) = *(cntr->pos) + interp;
+	//*(cntr->pos_interp) = *(cntr->pos) + interp;
+	if (*(cntr->index_ena)){
+	    if ( abs( (int)(*(cntr->ext_angle)*cntr->scale) - (int)(*(cntr->pos_interp) + cntr->ext_angle_offset*cntr->scale) ) == 1 ){
+	    *(cntr->index_ena) = 0;
+	    (cntr->ext_angle_offset) = *(cntr->ext_angle);
+	    }
+	}
+	*(cntr->pos_interp) = (*(cntr->ext_angle) - (cntr->ext_angle_offset)) * cntr->scale;
 	/* move on to next channel */
 	cntr++;
     }
@@ -596,6 +600,12 @@ static int export_encoder(counter_t * addr,char * prefix)
     /* export pin for minimum speed estimated by capture() */
     retval = hal_pin_float_newf(HAL_IN, &(addr->min_speed), comp_id,
             "%s.min-speed-estimate", prefix);
+    if (retval != 0) {
+	return retval;
+    }
+    /* export pin for ext_angle */
+    retval = hal_pin_float_newf(HAL_IN, &(addr->ext_angle), comp_id,
+            "%s.external_angle", prefix);
     if (retval != 0) {
 	return retval;
     }

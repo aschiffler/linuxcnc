@@ -6,7 +6,7 @@
 *
 * Author: Chris Radek
 * License: GPL Version 2
-*    
+*
 * Copyright (c) 2007 Chris Radek
 ********************************************************************/
 
@@ -24,7 +24,9 @@
 #endif
 
 struct haldata {
-    hal_float_t *pivot_length;
+    hal_float_t *enable;
+    hal_float_t *yshift;
+    hal_float_t *zshift;
 } *haldata;
 
 int kinematicsForward(const double *joints,
@@ -32,23 +34,18 @@ int kinematicsForward(const double *joints,
 		      const KINEMATICS_FORWARD_FLAGS * fflags,
 		      KINEMATICS_INVERSE_FLAGS * iflags)
 {
-    // B correction
-    double zb = (*(haldata->pivot_length) + joints[8]) * cos(d2r(joints[4]));
-    double xb = (*(haldata->pivot_length) + joints[8]) * sin(d2r(joints[4]));
-        
-    // C correction
-    double xyr = hypot(joints[0], joints[1]);
-    double xytheta = atan2(joints[1], joints[0]) + d2r(joints[5]);
+    // A correction
+    double yzr = hypot(joints[1] - *(haldata->yshift), joints[2] - *(haldata->zshift));
+    double yztheta = atan2(joints[2] - *(haldata->zshift), joints[1] - *(haldata->yshift)) - d2r(joints[3]);
 
-    // U correction
-    double zv = joints[6] * sin(d2r(joints[4]));
-    double xv = joints[6] * cos(d2r(joints[4]));
-
-    // V correction is always in joint 1 only
-
-    pos->tran.x = xyr * cos(xytheta) + xb - xv;
-    pos->tran.y = xyr * sin(xytheta) - joints[7];
-    pos->tran.z = joints[2] - zb + zv + *(haldata->pivot_length);
+    pos->tran.x = joints[0];
+    if (*(haldata->enable)==1.0){
+        pos->tran.y = *(haldata->yshift) + yzr * cos(yztheta);
+        pos->tran.z = *(haldata->zshift) + yzr * sin(yztheta);
+    }else{
+        pos->tran.y = joints[1];
+        pos->tran.z = joints[2];
+    }
 
     pos->a = joints[3];
     pos->b = joints[4];
@@ -65,23 +62,19 @@ int kinematicsInverse(const EmcPose * pos,
 		      const KINEMATICS_INVERSE_FLAGS * iflags,
 		      KINEMATICS_FORWARD_FLAGS * fflags)
 {
-    // B correction
-    double zb = (*(haldata->pivot_length) + pos->w) * cos(d2r(pos->b));
-    double xb = (*(haldata->pivot_length) + pos->w) * sin(d2r(pos->b));
-        
-    // C correction
-    double xyr = hypot(pos->tran.x, pos->tran.y);
-    double xytheta = atan2(pos->tran.y, pos->tran.x) - d2r(pos->c);
+    // A correction
+    double yzr = hypot(pos->tran.y - *(haldata->yshift), pos->tran.z - *(haldata->zshift));
+    double yztheta = atan2(pos->tran.z - *(haldata->zshift), pos->tran.y - *(haldata->yshift)) + d2r(pos->a);
 
-    // U correction
-    double zv = pos->u * sin(d2r(pos->b));
-    double xv = pos->u * cos(d2r(pos->b));
 
-    // V correction is always in joint 1 only
-
-    joints[0] = xyr * cos(xytheta) - xb + xv;
-    joints[1] = xyr * sin(xytheta) + pos->v;
-    joints[2] = pos->tran.z + zb + zv - *(haldata->pivot_length);
+    joints[0] = pos->tran.x;
+    if (*(haldata->enable)==1.0){
+        joints[1] = *(haldata->yshift) + yzr * cos(yztheta);
+        joints[2] = *(haldata->zshift) + yzr * sin(yztheta);
+    }else{
+        joints[1] = pos->tran.y;
+        joints[2] = pos->tran.z;
+    }
 
     joints[3] = pos->a;
     joints[4] = pos->b;
@@ -91,6 +84,18 @@ int kinematicsInverse(const EmcPose * pos,
     joints[8] = pos->w;
 
     return 0;
+}
+
+/* implemented for these kinematics as giving joints preference */
+int kinematicsHome(EmcPose * world,
+		   double *joint,
+		   KINEMATICS_FORWARD_FLAGS * fflags,
+		   KINEMATICS_INVERSE_FLAGS * iflags)
+{
+    *fflags = 0;
+    *iflags = 0;
+
+    return kinematicsForward(joint, world, fflags, iflags);
 }
 
 KINEMATICS_TYPE kinematicsType()
@@ -114,10 +119,17 @@ int rtapi_app_main(void) {
 
     haldata = hal_malloc(sizeof(struct haldata));
 
-    result = hal_pin_float_new("maxkins.pivot-length", HAL_IO, &(haldata->pivot_length), comp_id);
+    result = hal_pin_float_new("maxkins.enable", HAL_IO, &(haldata->enable), comp_id);
+    if(result < 0) goto error;
+    /* shift from machine zero to rotational center of a axes */
+    result = hal_pin_float_new("maxkins.a_axes_y_shift", HAL_IN, &(haldata->yshift), comp_id);
+    if(result < 0) goto error;
+    result = hal_pin_float_new("maxkins.a_axes_z_shift", HAL_IN, &(haldata->zshift), comp_id);
     if(result < 0) goto error;
 
-    *(haldata->pivot_length) = 0.666;
+    *(haldata->enable) = 1.0;
+    *(haldata->yshift) = 0.0;
+    *(haldata->zshift) = 0.0;
 
     hal_ready(comp_id);
     return 0;

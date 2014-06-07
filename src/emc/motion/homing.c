@@ -290,6 +290,7 @@ void do_homing(void)
             } else if (joint->home_latch_vel == 6.6) {
             /* joint did not need to be homed --> absolut position feedback*/
                 joint->home_state = HOME_LOCK;
+                immediate_state = 1;
 		    } else if (joint->home_flags & HOME_USE_INDEX) {
 			/* home using index pulse only */
 			joint->home_state = HOME_INDEX_ONLY_START;
@@ -599,7 +600,7 @@ void do_homing(void)
 		   switch position as accurately as possible.  It sets the
 		   current joint position to 'home_offset', which is the
 		   location of the home switch in joint coordinates. */
-        if (joint->home_pause_timer < (1 * servo_freq)) {
+        if (joint->home_pause_timer < (0.8 * servo_freq)) {
 		    /* no, update timer and wait some more */
 		    joint->home_pause_timer++;
 		    break;
@@ -776,6 +777,8 @@ void do_homing(void)
 		} else {
 		    immediate_state = 1;
 		}
+		joint->pos_cmd = joint->pos_fb;
+
 		joint->home_state = HOME_LOCK_WAIT;
 		break;
 
