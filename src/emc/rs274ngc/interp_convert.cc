@@ -146,6 +146,8 @@ int Interp::convert_nurbs(int mode,
             CHKS((settings->feed_rate == 0.0), (
                  _("Cannot make a NURBS with 0 feedrate")));
         }
+        if (settings->motion_mode != mode) nurbs_control_points.clear();
+
         if (nurbs_control_points.empty()) {
             CP.X = settings->current_x;
             CP.Y = settings->current_y;
@@ -1291,7 +1293,9 @@ int Interp::convert_param_comment(char *comment, char *expanded, int len)
             // we have the value
             if(found)
             {
-                int n = snprintf(valbuf, VAL_LEN, "%lf", value);
+		// avoid -0.0/0.0 issues
+		double pvalue = equal(value, 0.0) ? 0.0 : value;
+                int n = snprintf(valbuf, VAL_LEN, "%lf", pvalue);
                 bool fail = (n >= VAL_LEN || n < 0);
                 if(fail)
                     strcpy(valbuf, "######");
@@ -2710,6 +2714,9 @@ int Interp::gen_g_codes(int *current, int *saved, char *cmd)
 /*
  * given two int arrays representing interpreter settings as stored in
  * _setup.active_m_codes, construct a M-code sequence to synchronize their state.
+ *
+ * use multiple lines here because M7 and M8 may not be on the same line since
+ * they are in the same modal group.
  */
 int Interp::gen_m_codes(int *current, int *saved, char *cmd)
 {
@@ -2737,7 +2744,7 @@ int Interp::gen_m_codes(int *current, int *saved, char *cmd)
 	    case 7: // adaptive feed
 	    case 8: // feed hold
 		if (val != -1) {  // unsure..
-		    snprintf(buf,sizeof(buf)," M%d", val);
+		    snprintf(buf,sizeof(buf),"M%d\n", val);
 		    strncat(cmd,buf,sizeof(buf));
 		} else {
 		    MSG("------ gen_m_codes: index %d = -1!!\n",i);
@@ -2811,11 +2818,17 @@ int Interp::restore_settings(setup_pointer settings,
     gen_g_codes((int *)settings->active_g_codes, (int *)settings->sub_context[from_level].saved_g_codes,cmd);
 
     if (strlen(cmd) > 0) {
-	int status = execute(cmd);
-	if (status != INTERP_OK) {
-	    char currentError[LINELEN+1];
-	    strcpy(currentError,getSavedError());
-	    CHKS(status, _("M7x: restore_settings failed executing: '%s': %s"), cmd, currentError);
+	// the sequence can be multiline, separated by nl
+	// so split and execute each line
+	char *last = cmd;
+	char *s;
+	while ((s = strtok_r(last, "\n", &last)) != NULL) {
+	    int status = execute(s);
+	    if (status != INTERP_OK) {
+		char currentError[LINELEN+1];
+		strcpy(currentError,getSavedError());
+		CHKS(status, _("M7x: restore_settings failed executing: '%s': %s"), s, currentError);
+	    }
 	}
 	write_g_codes((block_pointer) NULL, settings);
 	write_m_codes((block_pointer) NULL, settings);
@@ -3020,11 +3033,6 @@ int Interp::convert_m(block_pointer block,       //!< pointer to a block of RS27
 	      set_tool_parameters();
 	  }
 	  break;
-
-      // deleted because it's covered by the recursion test for M6 above
-      // case 69: // alias original M6 to M69
-      // 	  CHP(convert_tool_change(settings));
-      // 	  break;
 
       default:
 	  if (IS_USER_MCODE(block,settings,6)) {
@@ -3231,7 +3239,7 @@ if (IS_USER_MCODE(block,settings,10) && ONCE_M(10)) {
      /* user-defined M codes */
     int index = block->m_modes[10];
     if (USER_DEFINED_FUNCTION[index - 100] == 0) {
-      CHKS(1, NCE_UNKNOWN_M_CODE_USED);
+      CHKS(1, NCE_UNKNOWN_M_CODE_USED,index);
     }
     enqueue_M_USER_COMMAND(index,block->p_number,block->q_number);
   }

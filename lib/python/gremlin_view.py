@@ -83,26 +83,14 @@ import datetime
 import gobject
 import glib # for glib.GError
 
-# __file__ is name of module
-mdir = os.path.abspath(os.path.join(
-                       os.path.dirname(
-                       os.path.realpath(__file__))))
-if (mdir.split('/')[-1] == "bin"):
-    # for standalone copy of this file installed in a bin directory:
-    BASE = os.path.abspath(os.path.join(mdir,".."))
-else:
-    BASE = os.path.abspath(os.path.join(mdir,"../.."))
-    if (BASE.split('/')[-1] == 'lib'):
-        BASE = os.path.abspath(os.path.join(mdir,"../../.."))
-
-g_ui_dir          = os.path.join(BASE, "share", "linuxcnc")
+g_ui_dir          = linuxcnc.SHARE + "/linuxcnc"
 g_periodic_secs   = 1 # integer
 g_delta_pixels    = 10
 g_move_delay_secs = 0.2
 g_progname        = os.path.basename(sys.argv[0])
 g_verbose         = False
 
-LOCALEDIR = os.path.join(BASE, "share", "locale")
+LOCALEDIR = linuxcnc.SHARE + "/locale"
 gettext.install("linuxcnc", localedir=LOCALEDIR, unicode=True)
 
 def ini_setup ():
@@ -516,7 +504,9 @@ class GremlinView():
         self.my_view = vletter
         self.halg.show()
 
-if __name__ == '__main__':
+#-----------------------------------------------------------------------------
+# Standalone (and demo) usage:
+def standalone_gremlin_view():
 
     import getopt
     #---------------------------------------

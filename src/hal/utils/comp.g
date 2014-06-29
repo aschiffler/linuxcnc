@@ -337,7 +337,6 @@ static int comp_id;
     if options.get("userspace"):
         print >>f, "#include <stdlib.h>"
 
-    print >>f, "struct __comp_state *__comp_inst=0;"
     print >>f, "struct __comp_state *__comp_first_inst=0, *__comp_last_inst=0;"
     
     print >>f
@@ -611,7 +610,7 @@ static int comp_id;
 
         if options.get("userspace"):
             print >>f, "#undef FOR_ALL_INSTS"
-            print >>f, "#define FOR_ALL_INSTS() for(__comp_inst = __comp_first_inst; __comp_inst; __comp_inst = __comp_inst->_next)"
+            print >>f, "#define FOR_ALL_INSTS() struct __comp_state *__comp_inst; for(__comp_inst = __comp_first_inst; __comp_inst; __comp_inst = __comp_inst->_next)"
     print >>f
     print >>f
 
@@ -887,6 +886,10 @@ def process(filename, mode, outfilename):
                     os.path.splitext(os.path.basename(filename))[0] + ".c")
 
         a, b = parse(filename)
+        base_name = os.path.splitext(os.path.basename(outfilename))[0]
+        if comp_name != base_name:
+            raise SystemExit, "Component name (%s) does not match filename (%s)" % (comp_name, base_name)
+
         f = open(outfilename, "w")
 
         if options.get("userinit") and not options.get("userspace"):

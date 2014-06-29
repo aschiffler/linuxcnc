@@ -33,7 +33,7 @@
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Sebastian Kuzminsky");
-MODULE_DESCRIPTION("Driver for HostMot2 on the 5i2[01235], 6i25, 4i6[589], and 3x20 Anything I/O boards from Mesa Electronics");
+MODULE_DESCRIPTION("Driver for HostMot2 on the 5i2[012345], 6i25, 4i6[589], and 3x20 Anything I/O boards from Mesa Electronics");
 MODULE_SUPPORTED_DEVICE("Mesa-AnythingIO-5i20");  // FIXME
 
 
@@ -53,6 +53,7 @@ static int num_5i20 = 0;
 static int num_5i21 = 0;
 static int num_5i22 = 0;
 static int num_5i23 = 0;
+static int num_5i24 = 0;
 static int num_5i25 = 0;
 static int num_6i25 = 0;
 static int num_4i65 = 0;
@@ -110,6 +111,14 @@ static struct pci_device_id hm2_pci_tbl[] = {
         .device = HM2_PCI_DEV_PLX9054,
         .subvendor = HM2_PCI_VENDORID_PLX,
         .subdevice = HM2_PCI_SSDEV_5I23,
+    },
+
+    // 5i24
+    {
+        .vendor =  HM2_PCI_VENDORID_MESA,
+        .device = HM2_PCI_DEV_MESA5I24,
+        .subvendor = HM2_PCI_VENDORID_MESA,
+        .subdevice = HM2_PCI_SSDEV_5I24,
     },
 
     // 5i25
@@ -511,6 +520,20 @@ static int hm2_pci_probe(struct pci_dev *dev, const struct pci_device_id *id) {
             break;
         }
 
+        case HM2_PCI_SSDEV_5I24: {
+            LL_PRINT("discovered 5i24 at %s\n", pci_name(dev));
+            rtapi_snprintf(board->llio.name, sizeof(board->llio.name), "hm2_5i24.%d", num_5i24);
+            num_5i24 ++;
+            board->llio.num_ioport_connectors = 3;
+            board->llio.pins_per_connector = 24;
+            board->llio.ioport_connector_name[0] = "P4";
+            board->llio.ioport_connector_name[1] = "P3";
+            board->llio.ioport_connector_name[2] = "P2";
+            board->llio.fpga_part_number = "xc6slx16ftg256";
+            board->llio.num_leds = 2;
+            break;
+        }
+
         case HM2_PCI_SSDEV_5I25:
         case HM2_PCI_SSDEV_6I25: {
             if (dev->subsystem_device == HM2_PCI_SSDEV_5I25) {
@@ -554,11 +577,11 @@ static int hm2_pci_probe(struct pci_dev *dev, const struct pci_device_id *id) {
         case HM2_PCI_SSDEV_4I69_25: {
             if (dev->subsystem_device == HM2_PCI_SSDEV_4I69_16) {
                 LL_PRINT("discovered 4I69-16 at %s\n", pci_name(dev));
-                board->llio.fpga_part_number = "6slx16fg256";
+                board->llio.fpga_part_number = "6slx16ftg256";
 
             } else {
                 LL_PRINT("discovered 4I69-25 at %s\n", pci_name(dev));
-                board->llio.fpga_part_number = "6slx25fg256";
+                board->llio.fpga_part_number = "6slx25ftg256";
             }
             rtapi_snprintf(board->llio.name, sizeof(board->llio.name), "hm2_4i69.%d", num_4i69);
             num_4i69 ++;
@@ -649,6 +672,7 @@ static int hm2_pci_probe(struct pci_dev *dev, const struct pci_device_id *id) {
             break;
         }
 
+        case HM2_PCI_DEV_MESA5I24:
         case HM2_PCI_DEV_MESA5I25:
         case HM2_PCI_DEV_MESA6I25: {
               // BAR 0 is 64K mem (32 bit)

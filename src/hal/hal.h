@@ -8,15 +8,15 @@
 
 /********************************************************************
 * Description:  hal.h
-*               This file, 'hal.h', defines the API and data
+*               This file, 'hal.h', defines the API and data 
 *               structures used by the HAL
 *
 * Author: John Kasunich
 * License: LGPL Version 2
-*
+*    
 * Copyright (c) 2003 All rights reserved.
 *
-* Last change:
+* Last change: 
 ********************************************************************/
 /* testing */
 
@@ -249,10 +249,10 @@ typedef enum {
     HAL_FLOAT = 2,
     HAL_S32 = 3,
     HAL_U32 = 4,
-    HAL_SPECIAL_U32 = 5
+	HAL_SPECIAL_U32 = 5
 } hal_type_t;
 
-/** HAL pins have a direction attribute.  A pin may be an input to
+/** HAL pins have a direction attribute.  A pin may be an input to 
     the HAL component, an output, or it may be bidirectional.
     Any number of HAL_IN or HAL_IO pins may be connected to the same
     signal, but only one HAL_OUT pin is permitted.  This is equivalent
@@ -296,7 +296,7 @@ typedef __u64 ireal_t __attribute__((aligned(8))); // integral type as wide as r
 /***********************************************************************
 *                      "LOCKING" FUNCTIONS                             *
 ************************************************************************/
-/** The 'hal_set_lock()' function sets locking based on one of the
+/** The 'hal_set_lock()' function sets locking based on one of the 
     locking types defined in hal.h
     HAL_LOCK_NONE -locks none
     HAL_LOCK_* - intermediate locking levels
@@ -304,7 +304,7 @@ typedef __u64 ireal_t __attribute__((aligned(8))); // integral type as wide as r
 */
 extern int hal_set_lock(unsigned char lock_type);
 
-/** The 'hal_get_lock()' function returns the current locking level
+/** The 'hal_get_lock()' function returns the current locking level 
     locking types defined in hal.h
     HAL_LOCK_NONE -locks none
     HAL_LOCK_* - intermediate locking levels
@@ -503,7 +503,7 @@ extern int hal_param_s32_new(const char *name, hal_param_dir_t dir,
     hal_s32_t * data_addr, int comp_id);
 
 /** printf_style-style versions of hal_param_XXX_new */
-extern int hal_param_bit_newf(hal_param_dir_t dir,
+extern int hal_param_bit_newf(hal_param_dir_t dir, 
     hal_bit_t * data_addr, int comp_id, const char *fmt, ...)
 	__attribute__((format(printf,4,5)));
 extern int hal_param_float_newf(hal_param_dir_t dir,

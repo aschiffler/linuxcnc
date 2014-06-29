@@ -1,3 +1,11 @@
+# see http://www.cmcrossroads.com/ask-mr-make/6535-tracing-rule-execution-in-gnu-make
+# to trace make execution of make in more detail:
+# make VV=1
+ifeq ("$(origin VV)", "command line")
+    OLD_SHELL := $(SHELL)
+    SHELL = $(warning Building $@$(if $<, (from $<))$(if $?, ($? newer)))$(OLD_SHELL)
+endif
+
 # Delete the default suffix rules
 .SUFFIXES:
 .PHONY: default userspace modules clean modclean depclean install python pythonclean
@@ -82,9 +90,6 @@ endif
 endif
 
 
-# list of supported hostmot2 boards
-HM2_BOARDS = 3x20 4i65 4i68 5i20 5i22 5i23 7i43
-
 # Print 'entering' all the time
 MAKEFLAGS += w
 
@@ -103,9 +108,11 @@ SUBDIRS := \
     \
     hal/components hal/drivers hal/drivers/ethercat hal/user_comps/devices hal/user_comps/mb2hal \
     hal/user_comps hal/user_comps/vismach hal/user_comps/vfs11_vfd hal/classicladder hal/utils hal \
+    hal/user_comps/vfdb_vfd hal/user_comps/wj200_vfd \
     \
     emc/usr_intf/axis emc/usr_intf/touchy emc/usr_intf/stepconf emc/usr_intf/pncconf \
     emc/usr_intf/gremlin \ emc/usr_intf/gscreen \
+    emc/usr_intf/gmoccapy \
     emc/usr_intf emc/nml_intf emc/task emc/iotask emc/kinematics emc/canterp \
     emc/motion emc/ini emc/rs274ngc emc/sai emc emc/pythonplugin \
     \
@@ -176,20 +183,16 @@ endif
 
 # Each directory in $(INCLUDES) is passed as a -I directory when compiling.
 INCLUDE := $(patsubst %,-I%, $(INCLUDES)) -I$(RTDIR)/include
-
-ifneq ($(KERNELDIR),)
-INCLUDE += -I$(KERNELDIR)/include
-endif
-
 ifeq ($(BUILD_PYTHON),yes)
 INCLUDE += -I$(INCLUDEPY)
 endif
 
-# Compilation options.	Perhaps some of these should come from Makefile.inc?
-OPT := -Os
+# Compilation options.	Perhaps some of these should come from Makefile.inc? (CXXFLAGS now does)
+INTEGER_OVERFLOW_FLAGS := $(call cc-option,-fwrapv) $(call cc-option, -fno-strict-overflow)
+OPT := -Os $(INTEGER_OVERFLOW_FLAGS)
 DEBUG := -g -Wall
-CFLAGS := $(INCLUDE) $(OPT) $(DEBUG) -DULAPI $(call cc-option, -Wdeclaration-after-statement) $(BITOPS_DEFINE)
-CXXFLAGS := $(INCLUDE) $(OPT) $(DEBUG) -DULAPI $(BITOPS_DEFINE)
+CFLAGS := $(INCLUDE) $(OPT) $(DEBUG) -DULAPI $(call cc-option,-std=gnu99 -fgnu89-inline)
+CXXFLAGS := $(INCLUDE) $(CXXFLAGS)   -DULAPI $(DEBUG) $(OPT)
 
 ifeq ($(RUN_IN_PLACE),yes)
 LDFLAGS := -L$(LIB_DIR) -Wl,-rpath,$(LIB_DIR)
@@ -241,12 +244,6 @@ Makefile: config.h
 config.h: config.h.in config.status
 	@./config.status -q --header=$@
 
-INFILES_MOVE = \
-        ../docs/man/man1/linuxcnc.1
-
-../docs/man/man1/linuxcnc.1: ../docs/src/man/man1/linuxcnc.1.in config.status
-	./config.status --file=$@:$<
-
 INFILES = \
         ../scripts/linuxcnc ../scripts/realtime \
 	../scripts/haltcl ../scripts/rtapi.conf Makefile.inc Makefile.modinc \
@@ -255,17 +252,12 @@ INFILES = \
 	 ../lib/python/nf.py \
 	../share/desktop-directories/cnc.directory ../share/menus/CNC.menu \
 	../share/applications/linuxcnc.desktop \
-	../share/applications/linuxcnc-latency.desktop \
-
-ifeq ($(HAVE_WORKING_BLT),yes)
-INFILES += ../scripts/latencyplot ../share/applications/linuxcnc-latencyplot.desktop
-INFILES += ../scripts/latencyhistogram
-endif
+	../scripts/linuxcnc_var \
 
 $(INFILES): %: %.in config.status
 	@./config.status --file=$@
 
-default: $(INFILES) $(INFILES_MOVE)
+default: $(INFILES)
 
 # For each file to be copied to ../include, its location in the source tree
 # is listed here.  Note that due to $(INCLUDE), defined above, the include
@@ -277,6 +269,7 @@ HEADERS := \
     emc/ini/iniaxis.hh \
     emc/ini/initool.hh \
     emc/ini/initraj.hh \
+    emc/ini/inihal.hh \
     emc/kinematics/cubic.h \
     emc/kinematics/kinematics.h \
     emc/kinematics/genhexkins.h \
@@ -300,6 +293,7 @@ HEADERS := \
     emc/nml_intf/motion_types.h \
     emc/nml_intf/debugflags.h \
     emc/rs274ngc/interp_internal.hh \
+    emc/rs274ngc/interp_base.hh \
     emc/rs274ngc/rs274ngc.hh \
     hal/hal.h \
     hal/hal_parport.h \
@@ -367,13 +361,52 @@ TARGETS += $(patsubst %,../include/%,$(foreach h,$(HEADERS),$(notdir $h)))
 
 # Add converting of %.po files
 TARGETS += $(patsubst po/%.po, ../share/locale/%/LC_MESSAGES/linuxcnc.mo, $(wildcard po/*.po))
+TARGETS += $(patsubst po/gmoccapy/%.po, ../share/locale/%/LC_MESSAGES/gmoccapy.mo, $(wildcard po/gmoccapy/*.po))
 TARGETS += $(patsubst po/%.po, objects/%.msg, $(wildcard po/*.po))
+
+# tooledit as standalone app:
+TARGETS += ../bin/tooledit
+../bin/tooledit: Makefile
+	$(Q)rm -f $@
+	$(Q)(echo "#!$(TCLSH)")>|$@
+	$(Q)(echo "source $(EMC2_TCL_LIB_DIR)/tooledit.tcl")>>$@
+	$(Q)(echo "standalone_tooledit")>>$@
+	$(Q)chmod +x $@
 
 # ngcgui as standalone app:
 TARGETS += ../bin/ngcgui
-../bin/ngcgui: ../tcl/ngcgui.tcl
-	cp $< $@
-	chmod +x $@
+../bin/ngcgui: Makefile
+	$(Q)rm -f $@
+	$(Q)(echo "#!$(TCLSH)")>|$@
+	$(Q)(echo "source $(EMC2_TCL_LIB_DIR)/ngcgui.tcl")>>$@
+	$(Q)(echo "::ngcgui::standalone_ngcgui")>>$@
+	$(Q)chmod +x $@
+
+# pyngcgui as standalone app:
+TARGETS += ../bin/pyngcgui
+../bin/pyngcgui: Makefile
+	$(Q)rm -f $@
+	$(Q)(echo "#!$(PYTHON)")>|$@
+	$(Q)(echo "import pyngcgui")>>$@
+	$(Q)(echo "pyngcgui.standalone_pyngcgui()")>>$@
+	$(Q)chmod +x $@
+
+# gremlin_view as standalone app:
+TARGETS += ../bin/gremlin_view
+../bin/gremlin_view: Makefile
+	$(Q)rm -f $@
+	$(Q)(echo "#!$(PYTHON)")>|$@
+	$(Q)(echo "import gremlin_view")>>$@
+	$(Q)(echo "gremlin_view.standalone_gremlin_view()")>>$@
+	$(Q)chmod +x $@
+
+# halshow as standalone app:
+TARGETS += ../bin/halshow
+../bin/halshow: Makefile
+	$(Q)rm -f $@
+	$(Q)(echo "#!$(TCLSH)")>|$@
+	$(Q)(echo "source $(EMC2_TCL_LIB_DIR)/bin/halshow.tcl")>>$@
+	$(Q)chmod +x $@
 
 # And make userspace depend on $(TARGETS)
 userspace: $(TARGETS)
@@ -463,11 +496,6 @@ install:
 MENUS = ../share/menus/CNC.menu \
     ../share/desktop-directories/cnc.directory \
     ../share/applications/linuxcnc.desktop \
-    ../share/applications/linuxcnc-latency.desktop
-
-ifeq ($(HAVE_WORKING_BLT),yes)
-MENUS += ../share/applications/linuxcnc-latencyplot.desktop
-endif
 
 install-menus install-menu: $(MENUS)
 	mkdir -p $(HOME)/.config/menus/applications-merged
@@ -509,9 +537,12 @@ install-dirs:
 		$(DESTDIR)$(datadir)/axis/images \
 		$(DESTDIR)$(datadir)/axis/tcl \
 		$(DESTDIR)$(datadir)/gscreen/images \
+		$(DESTDIR)$(datadir)/gscreen/skins \
+		$(DESTDIR)$(datadir)/gmoccapy/images \
 		$(DESTDIR)$(datadir)/glade3/catalogs \
 		$(DESTDIR)$(datadir)/glade3/pixmaps \
 		$(DESTDIR)$(datadir)/gtksourceview-2.0/language-specs \
+		$(DESTDIR)$(datadir)/linuxcnc/stepconf \
 		$(DESTDIR)$(datadir)/linuxcnc/pncconf/pncconf-help
 
 install-kernel-indep: install-dirs
@@ -534,13 +565,16 @@ install-kernel-indep: install-dirs
 
 	$(EXE) $(filter-out ../bin/linuxcnc_module_helper ../bin/pci_write ../bin/pci_read ../bin/test_rtapi_vsnprintf, $(filter ../bin/%,$(TARGETS))) $(DESTDIR)$(bindir)
 	$(EXE) ../scripts/linuxcnc $(DESTDIR)$(bindir)
+	$(EXE) ../scripts/linuxcnc_info $(DESTDIR)$(bindir)
+	$(EXE) ../scripts/linuxcnc_var $(DESTDIR)$(bindir)
 	$(EXE) ../scripts/latency-test $(DESTDIR)$(bindir)
 ifeq ($(HAVE_WORKING_BLT),yes)
-	$(EXE) ../scripts/latencyplot $(DESTDIR)$(bindir)
-	$(EXE) ../scripts/latencyhistogram $(DESTDIR)$(bindir)
+	$(EXE) ../scripts/latency-plot $(DESTDIR)$(bindir)
+	$(EXE) ../scripts/latency-histogram $(DESTDIR)$(bindir)
 endif
+	$(EXE) ../scripts/pyvcp_demo $(DESTDIR)$(bindir)
+	$(EXE) ../scripts/gladevcp_demo $(DESTDIR)$(bindir)
 	$(EXE) ../scripts/linuxcncmkdesktop $(DESTDIR)$(bindir)
-	$(EXE) ../bin/tooledit $(DESTDIR)$(bindir)
 	$(FILE) $(filter ../lib/%.a ../lib/%.so.0,$(TARGETS)) $(DESTDIR)$(libdir)
 	cp --no-dereference $(filter ../lib/%.so, $(TARGETS)) $(DESTDIR)$(libdir)
 	-ldconfig $(DESTDIR)$(libdir)
@@ -559,10 +593,12 @@ endif
 	$(EXE) $(TCL_BIN) $(DESTDIR)$(tcldir)/bin
 	$(FILE) ../tcl/scripts/balloon.tcl ../tcl/scripts/emchelp.tcl $(DESTDIR)$(tcldir)/scripts
 	$(EXE) ../tcl/scripts/Set_Coordinates.tcl $(DESTDIR)$(tcldir)/scripts
-	$(FILE) ../share/linuxcnc/stepconf.glade $(DESTDIR)$(prefix)/share/linuxcnc
+	$(FILE) ../share/linuxcnc/*.glade $(DESTDIR)$(prefix)/share/linuxcnc
+	$(FILE) ../share/linuxcnc/stepconf/*.glade $(DESTDIR)$(prefix)/share/linuxcnc/stepconf
 	$(FILE) ../share/linuxcnc/touchy.glade $(DESTDIR)$(prefix)/share/linuxcnc
 	$(FILE) ../share/linuxcnc/gscreen.glade $(DESTDIR)$(prefix)/share/linuxcnc
 	$(FILE) ../share/linuxcnc/gscreen2.glade $(DESTDIR)$(prefix)/share/linuxcnc
+	$(FILE) ../share/gmoccapy/gmoccapy.glade $(DESTDIR)$(prefix)/share/gmoccapy
 	$(FILE) ../share/linuxcnc/pncconf.glade $(DESTDIR)$(prefix)/share/linuxcnc
 	$(FILE) ../share/linuxcnc/gremlin_view.ui $(DESTDIR)$(prefix)/share/linuxcnc
 	$(FILE) ../share/linuxcnc/popupkeyboard.ui $(DESTDIR)$(prefix)/share/linuxcnc
@@ -581,21 +617,41 @@ install-python: install-dirs
 	$(DIR) $(DESTDIR)$(SITEPY) $(DESTDIR)$(SITEPY)/rs274
 	$(DIR) $(DESTDIR)$(SITEPY)/touchy
 	$(DIR) $(DESTDIR)$(SITEPY)/gscreen
+	$(DIR) $(DESTDIR)$(SITEPY)/gmoccapy
 	$(DIR) $(DESTDIR)$(SITEPY)/gladevcp
+	$(DIR) $(DESTDIR)$(SITEPY)/stepconf
 	$(FILE) ../lib/python/*.py ../lib/python/*.so $(DESTDIR)$(SITEPY)
 	$(FILE) ../lib/python/rs274/*.py $(DESTDIR)$(SITEPY)/rs274
 	$(FILE) ../lib/python/touchy/*.py $(DESTDIR)$(SITEPY)/touchy
 	$(FILE) ../lib/python/gscreen/*.py $(DESTDIR)$(SITEPY)/gscreen
+	$(FILE) ../lib/python/gmoccapy/*.py $(DESTDIR)$(SITEPY)/gmoccapy
 	$(FILE) ../lib/python/gladevcp/*.py $(DESTDIR)$(SITEPY)/gladevcp
 	$(FILE) ../lib/python/gladevcp/*.glade $(DESTDIR)$(SITEPY)/gladevcp
-	$(EXE) ../bin/stepconf ../bin/pncconf ../bin/hal_input ../bin/pyvcp ../bin/gladevcp ../bin/axis ../bin/axis-remote ../bin/debuglevel ../bin/linuxcnctop ../bin/mdi ../bin/hal_manualtoolchange ../bin/image-to-gcode ../bin/touchy ../bin/gscreen $(DESTDIR)$(bindir)
+	$(FILE) ../lib/python/stepconf/*.py $(DESTDIR)$(SITEPY)/stepconf
+	$(EXE) ../bin/stepconf $(DESTDIR)$(bindir)
+	$(EXE) ../bin/pncconf $(DESTDIR)$(bindir)
+	$(EXE) ../bin/hal_input $(DESTDIR)$(bindir)
+	$(EXE) ../bin/pyvcp $(DESTDIR)$(bindir)
+	$(EXE) ../bin/gladevcp $(DESTDIR)$(bindir)
+	$(EXE) ../bin/axis $(DESTDIR)$(bindir)
+	$(EXE) ../bin/axis-remote $(DESTDIR)$(bindir)
+	$(EXE) ../bin/debuglevel $(DESTDIR)$(bindir)
+	$(EXE) ../bin/linuxcnctop $(DESTDIR)$(bindir)
+	$(EXE) ../bin/mdi $(DESTDIR)$(bindir)
+	$(EXE) ../bin/hal_manualtoolchange $(DESTDIR)$(bindir)
+	$(EXE) ../bin/image-to-gcode $(DESTDIR)$(bindir)
+	$(EXE) ../bin/touchy $(DESTDIR)$(bindir)
+	$(EXE) ../bin/gscreen $(DESTDIR)$(bindir)
+	$(EXE) ../bin/gmoccapy $(DESTDIR)$(bindir)
 	$(EXE) $(patsubst %.py,../bin/%,$(VISMACH_PY)) $(DESTDIR)$(bindir)
 	$(FILE) ../share/linuxcnc/linuxcnc-wizard.gif $(DESTDIR)$(prefix)/share/linuxcnc
 	$(FILE) emc/usr_intf/axis/etc/axis_light_background $(DESTDIR)$(docsdir)
 	$(FILE) emc/usr_intf/axis/README $(DESTDIR)$(docsdir)/README.axis
-	$(FILE) ../share/axis/images/*.gif ../share/axis/images/*.xbm ../share/axis/images/*.ngc $(DESTDIR)$(datadir)/axis/images
+	$(FILE) ../share/axis/images/*.png ../share/axis/images/*.gif ../share/axis/images/*.xbm ../share/axis/images/*.ngc $(DESTDIR)$(datadir)/axis/images
 	$(FILE) ../share/axis/tcl/*.tcl $(DESTDIR)$(datadir)/axis/tcl
 	$(FILE) ../share/gscreen/images/*.gif $(DESTDIR)$(datadir)/gscreen/images
+	$(TREE) ../share/gscreen/skins/* $(DESTDIR)$(datadir)/gscreen/skins
+	$(FILE) ../share/gmoccapy/images/*.png ../share/gmoccapy/images/*.gif ../share/gmoccapy/images/*.svg $(DESTDIR)$(datadir)/gmoccapy/images
 endif
 
 install-kernel-dep:
@@ -614,14 +670,43 @@ endif # RUN_IN_PLACE
 
 CONF=../configs
 COMMON=$(CONF)/common
-CONFILES=$(addsuffix /$(1), $(filter-out $(COMMON), $(wildcard $(CONF)/*)))
+CONFILES=$(addsuffix /$(1), $(filter-out $(COMMON) $(CONF),\
+                                         ${shell find ${CONF} -type d -print}))
+
 .PHONY: configs
-COPY_CONFIGS := \
-	$(patsubst %,../configs/%/core_stepper.hal, demo_step_cl stepper demo_sim_cl Sherline3Axis SherlineLathe cooltool) \
-	$(patsubst %,../configs/%/core_servo.hal, motenc stg vti) \
-	$(patsubst %,../configs/%/core_sim.hal, halui_pyvcp sim) \
-	$(patsubst %,../configs/%/core_sim9.hal, sim) \
-	$(patsubst %,../configs/%/axis_manualtoolchange.hal, sim lathe-pluto)
+COPY_CONFIGS = $(patsubst %,../configs/%/core_stepper.hal, \
+                sim \
+                by_interface/parport/stepper \
+                by_machine/sherline/Sherline3Axis \
+                by_machine/sherline/SherlineLathe \
+                by_machine/cooltool \
+                by_interface/parport/classicladder/demo_step_cl)
+
+COPY_CONFIGS += $(patsubst %,../configs/%/core_servo.hal, \
+                sim \
+                by_interface/vitalsystems \
+                by_interface/servotogo \
+                by_interface/vigilant)
+
+COPY_CONFIGS += $(patsubst %,../configs/%/core_sim.hal, \
+                sim)
+
+COPY_CONFIGS += $(patsubst %,../configs/%/core_sim9.hal, \
+                sim)
+
+COPY_CONFIGS += $(patsubst %,../configs/%/axis_manualtoolchange.hal, \
+                sim \
+                by_interface/pluto/lathe-pluto\
+                by_interface/parport/plasma-thc-sim)
+
+show_configs_copy_stuff:
+	@echo CONFILES=$(CONFILES)
+	@echo CALL:$(call CONFILES,axis_manualtoolchange.hal)
+	@echo CALL:$(call CONFILES,core_stepper.hal)
+	@echo CALL:$(call CONFILES,core_servo.hal)
+	@echo CALL:$(call CONFILES,core_sim.hal)
+	@echo CALL:$(call CONFILES,core_sim9.hal)
+	@echo COPY_CONFIGS=$(COPY_CONFIGS)
 
 configs: $(COPY_CONFIGS)
 
@@ -657,7 +742,8 @@ EXTRA_CFLAGS = $(filter-out -ffast-math,$(RTFLAGS)) -D__MODULE__ -I$(BASEPWD) -I
 	-I$(BASEPWD)/emc/nml_intf -I$(BASEPWD)/emc/kinematics -I$(BASEPWD)/emc/motion \
 	-DSEQUENTIAL_SUPPORT -DHAL_SUPPORT -DDYNAMIC_PLCSIZE -DRT_SUPPORT -DOLD_TIMERS_MONOS_SUPPORT -DMODBUS_IO_MASTER \
 	-fno-fast-math $(call cc-option,-mieee-fp) -fno-unsafe-math-optimizations \
-	$(call cc-option,-Wframe-larger-than=2560)
+	$(call cc-option,-Wframe-larger-than=2560) $(call cc-option,-Wno-declaration-after-statement) \
+	$(INTEGER_OVERFLOW_FLAGS)
 ifneq ($(KERNELRELEASE),)
 ifeq ($(RTARCH):$(RTAI):$(filter $(RTFLAGS),-msse),x86_64:3:)
 EXTRA_CFLAGS += -msse
@@ -705,8 +791,6 @@ obj-$(CONFIG_MATRIX_KB) += matrix_kb.o
 matrix_kb-objs := hal/components/matrix_kb.o $(MATHSTUB)
 obj-$(CONFIG_MUX_GENERIC) += mux_generic.o
 mux_generic-objs := hal/components/mux_generic.o $(MATHSTUB)
-obj-$(CONFIG_FREQGEN) += freqgen.o
-freqgen-objs := hal/components/freqgen.o $(MATHSTUB)
 obj-$(CONFIG_PWMGEN) += pwmgen.o
 pwmgen-objs := hal/components/pwmgen.o $(MATHSTUB)
 obj-$(CONFIG_SIGGEN) += siggen.o
@@ -761,12 +845,13 @@ opto_ac5-objs := hal/drivers/opto_ac5.o $(MATHSTUB)
 obj-$(CONFIG_HAL_GM) += hal_gm.o
 hal_gm-objs := hal/drivers/hal_gm.o $(MATHSTUB)
 
-obj-$(CONFIG_HOSTMOT2) += hostmot2.o hm2_7i43.o hm2_pci.o hm2_test.o setsserial.o
+obj-$(CONFIG_HOSTMOT2) += hostmot2.o hm2_7i43.o hm2_7i90.o hm2_pci.o hm2_test.o setsserial.o
 hostmot2-objs :=			  \
     hal/drivers/mesa-hostmot2/hostmot2.o  \
     hal/drivers/mesa-hostmot2/backported-strings.o  \
     hal/drivers/mesa-hostmot2/ioport.o	  \
     hal/drivers/mesa-hostmot2/encoder.o   \
+    hal/drivers/mesa-hostmot2/abs_encoder.o\
 	hal/drivers/mesa-hostmot2/resolver.o  \
     hal/drivers/mesa-hostmot2/pwmgen.o	  \
     hal/drivers/mesa-hostmot2/tp_pwmgen.o \
@@ -776,9 +861,14 @@ hostmot2-objs :=			  \
 	hal/drivers/mesa-hostmot2/uart.o	  \
     hal/drivers/mesa-hostmot2/watchdog.o  \
     hal/drivers/mesa-hostmot2/pins.o	  \
+    hal/drivers/mesa-hostmot2/dpll.o  \
     hal/drivers/mesa-hostmot2/led.o	  \
     hal/drivers/mesa-hostmot2/tram.o	  \
     hal/drivers/mesa-hostmot2/raw.o	  \
+    hal/drivers/mesa-hostmot2/bitfile.o   \
+    $(MATHSTUB)
+hm2_7i90-objs :=			  \
+    hal/drivers/mesa-hostmot2/hm2_7i90.o  \
     hal/drivers/mesa-hostmot2/bitfile.o   \
     $(MATHSTUB)
 hm2_7i43-objs :=			  \
@@ -951,7 +1041,6 @@ endif
 ../rtlib/lcd$(MODULE_EXT): $(addprefix objects/rt,$(lcd-objs))
 ../rtlib/matrix_kb$(MODULE_EXT): $(addprefix objects/rt,$(matrix_kb-objs))
 ../rtlib/mux_generic$(MODULE_EXT): $(addprefix objects/rt,$(mux_generic-objs))
-../rtlib/freqgen$(MODULE_EXT): $(addprefix objects/rt,$(freqgen-objs))
 ../rtlib/pwmgen$(MODULE_EXT): $(addprefix objects/rt,$(pwmgen-objs))
 ../rtlib/siggen$(MODULE_EXT): $(addprefix objects/rt,$(siggen-objs))
 ../rtlib/at_pid$(MODULE_EXT): $(addprefix objects/rt,$(at_pid-objs))

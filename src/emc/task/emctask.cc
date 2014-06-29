@@ -418,7 +418,6 @@ int emcTaskPlanInit()
         inifile.Close();
     }
     if(!pinterp) {
-	rcs_print("emcTaskInit: using builtin interpreter\n");
         pinterp = new Interp;
     }
 
@@ -500,9 +499,11 @@ int emcTaskPlanSynch()
     return retval;
 }
 
-int emcTaskPlanExit()
+void emcTaskPlanExit()
 {
-    return interp.exit();
+    if (pinterp != NULL) {
+        interp.exit();
+    }
 }
 
 int emcTaskPlanOpen(const char *file)

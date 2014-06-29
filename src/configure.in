@@ -93,23 +93,6 @@ AS_IF([test "x$ac_cv_boost_python" = xyes && test "x$BOOST_PYTHON_LIBS" != x],
 AC_SUBST([BOOST_PYTHON_LIBS])
 ])
 
-AC_MSG_CHECKING(libgl1-mesa-dri workaround)
-
-PRELOAD_WORKAROUND=`../scripts/test-libgl-bug.sh 2>/dev/null`
-if test  $? -ne 0 ; then
-   # real bad, the test failed - let me know
-   AC_MSG_RESULT([test for libgl1-mesa-dri workaround failed, please file a bug])
-   exit 1
-fi
-if test "x$PRELOAD_WORKAROUND" != "x" ; then
-   AC_MSG_RESULT(required - need to preload $PRELOAD_WORKAROUND)
-else
-   AC_MSG_RESULT(not required)
-fi
-
-
-
-
 AC_MSG_CHECKING(build toplevel)
 BUILD_TOPLEVEL="$(cd ..; pwd -P)"
 AC_MSG_RESULT($BUILD_TOPLEVEL)
@@ -368,11 +351,8 @@ AC_DEFINE_UNQUOTED([RTDIR], "$RTDIR", [Directory of the installed realtime syste
 # Subsection 3.1 - checking for a CC (we must use the same one used for RT)  #
 # Subsection 3.2 - check for the kernel version, with RT patches             #
 # Subsection 3.3 - check the moduledir where modules can get installed       #
-# Subsection 3.4 - define default dirs                                       #
-# Subsection 3.5 - check for GTK                                             #
-# Subsection 3.6 - check for utility programs needed to build and run EMC    #
-# Subsection 3.7 - check for programs needed to build documentation          #
-# Subsection 3.8 - check for additional realtime packages                    #
+# Subsection 3.4 - check for GTK                                             #
+# Subsection 3.5 - check for utility programs needed to build and run EMC    #
 ##############################################################################
 
 
@@ -475,6 +455,45 @@ AS_IF(
           AC_MSG_ERROR([libmodbus3 not found!
 install with "sudo apt-get install libmodbus-dev" or disable with
 "configure --without-libmodbus"])
+        fi
+    ]
+)
+
+
+#
+# check for libusb-1.0
+#
+
+AC_ARG_WITH(
+    [libusb-1.0],
+    [  --with-libusb-1.0                       Specify whether or not to build
+                                          the drivers that use libusb-1.0
+                                          (defaults to "yes")],
+    [WITH_LIBUSB10=$withval],
+    [WITH_LIBUSB10=yes]
+)
+
+AS_IF(
+    [test "x$WITH_LIBUSB10" = "xyes"],
+    [
+        AC_MSG_CHECKING([for libusb-1.0])
+        if pkg-config libusb-1.0 >/dev/null 2>&1; then
+            AC_MSG_RESULT(yes)
+            LIBUSB10_CFLAGS=`pkg-config libusb-1.0 --cflags`
+            AC_SUBST([LIBUSB10_CFLAGS])
+            LIBUSB10_LIBS=`pkg-config libusb-1.0 --libs`
+            AC_SUBST([LIBUSB10_LIBS])
+            AC_DEFINE(
+                [HAVE_LIBUSB10],
+                [yes],
+                [define if the libusb-1.0 headers and library are available]
+            )
+            AC_SUBST(HAVE_LIBUSB10, yes)
+        else
+          AC_MSG_RESULT(no)
+          AC_MSG_ERROR([libusb-1.0 not found!
+install with "sudo apt-get install libusb-1.0-0-dev" or disable with
+"configure --without-libusb-1.0"])
         fi
     ]
 )
@@ -639,7 +658,6 @@ fe () {
 
 if test "xyes" = "x$RUN_IN_PLACE"; then
     EMC2_LATENCY_SCRIPT=$EMC2_HOME/scripts/latency-test
-    EMC2_LATENCYPLOT_SCRIPT=$EMC2_HOME/scripts/latencyplot
     EMC2_SCRIPT=$EMC2_HOME/scripts/emc
     EMC2_SUFFIX=" (run-in-place)"
     EMC2_ICON=$EMC2_HOME/linuxcncicon.png
@@ -658,7 +676,6 @@ else
     EMC2_HOME=${prefix}
     EMC2_BIN_DIR=${prefix}/bin
     EMC2_LATENCY_SCRIPT=$EMC2_BIN_DIR/latency-test
-    EMC2_LATENCYPLOT_SCRIPT=$EMC2_BIN_DIR/latencyplot
     EMC2_SCRIPT=$EMC2_BIN_DIR/emc
     EMC2_SUFFIX=""
     EMC2_ICON=linuxcncicon
@@ -774,21 +791,82 @@ AC_SUBST(GLIB_CFLAGS)
 SPATH=$PATH:/usr/local/sbin:/usr/sbin:/sbin
 AC_PROG_CXX
 
+m4_include([m4/ax_cxx_compile_stdcxx_11.m4])
+# make this optional - it will likely only result in warnings
+AX_CXX_COMPILE_STDCXX_11(noext,optional)
+
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 AC_PATH_PROG(AR,ar)
 AC_PATH_PROG(INSTALL, install)
-AC_PATH_PROG(SED, sed)
-AC_PATH_PROG(PS, ps)
-AC_PATH_PROG(KILL, kill)
-AC_PATH_PROG(WHOAMI, whoami)
-AC_PATH_PROG(AWK, awk)
-AC_PATH_PROG(INSMOD, insmod, $SPATH)
-AC_PATH_PROG(RMMOD, rmmod, "", $SPATH)
-AC_PATH_PROG(LSMOD, lsmod, "", $SPATH)
-AC_PATH_PROG(PIDOF, pidof, "", $SPATH)
-AC_PATH_PROG(IPCS, ipcs, "")
-AC_PATH_PROG(FUSER, fuser, "", $SPATH)
+
+AC_PATH_PROG(SED, sed, "none")
+if test $SED = "none"
+then
+    AC_MSG_ERROR([sed not found])
+fi
+
+AC_PATH_PROG(PS, ps, "none")
+if test $PS = "none"
+then
+    AC_MSG_ERROR([ps not found])
+fi
+
+AC_PATH_PROG(KILL, kill, "none")
+if test $KILL = "none"
+then
+    AC_MSG_ERROR([kill not found])
+fi
+
+AC_PATH_PROG(WHOAMI, whoami, "none")
+if test $WHOAMI = "none"
+then
+    AC_MSG_ERROR([whoami not found])
+fi
+
+AC_PATH_PROG(AWK, awk, "none")
+if test $AWK = "none"
+then
+    AC_MSG_ERROR([awk not found])
+fi
+
+AC_PATH_PROG(INSMOD, insmod, "none", $SPATH)
+if test $INSMOD = "none"
+then
+    AC_MSG_ERROR([insmod not found])
+fi
+
+AC_PATH_PROG(RMMOD, rmmod, "none", $SPATH)
+if test $RMMOD = "none"
+then
+    AC_MSG_ERROR([rmmod not found])
+fi
+
+AC_PATH_PROG(LSMOD, lsmod, "none", $SPATH)
+if test $LSMOD = "none"
+then
+    AC_MSG_ERROR([lsmod not found])
+fi
+
+AC_PATH_PROG(PIDOF, pidof, "none", $SPATH)
+if test $PIDOF = "none"
+then
+    AC_MSG_ERROR([pidof not found])
+fi
+
+AC_PATH_PROG(IPCS, ipcs, "none")
+if test $IPCS = "none"
+then
+    AC_MSG_ERROR([ipcs not found])
+fi
+
+AC_PATH_PROG(FUSER, fuser, "none", $SPATH)
+if test $FUSER = "none"
+then
+    AC_MSG_ERROR([fuser not found])
+fi
+
+# MANDB empty is handled in doc/Submakefile
 AC_PATH_PROG(MANDB, mandb, "")
 
 AC_ARG_WITH(rmmod,
@@ -893,6 +971,11 @@ if ( test "$BUILD_DOCS" = "yes" ) ; then
 	AC_MSG_ERROR([no AsciiDoc, documentation cannot be built])
     fi
 
+    AC_PATH_PROG(A2X,a2x,"none")
+    if ( test "none" = "$A2X" ) ; then
+	AC_MSG_ERROR([no a2x, documentation cannot be built])
+    fi
+
     AC_MSG_CHECKING([asciidoc version])
     set -- `asciidoc --version`; ASCIIDOC_VER=$2
     set -- `echo $ASCIIDOC_VER | sed 's/\./ /g'`
@@ -905,6 +988,27 @@ On Hardy, install the backported asciidoc available from the linuxcnc.org debian
 On other systems, do what you need to install asciidoc version 8.5 or newer.])
     fi
     AC_MSG_RESULT([$ASCIIDOC_VER])
+
+    AC_MSG_CHECKING([whether to specify latex.encoding])
+    temp_asciidoc=`tempfile --suffix=.txt`
+    cat > $temp_asciidoc <<EOF
+:lang: fr
+:ascii-ids:
+
+....
+umläut nuß
+....
+EOF
+    if $A2X --dblatex-opts "-P latex.encoding=utf8" $temp_asciidoc > /dev/null 2>&1;
+    then
+        A2X_LATEX_ENCODING="-P latex.encoding=utf8"
+        AC_MSG_RESULT(yes)
+    else
+        A2X_LATEX_ENCODING=""
+        AC_MSG_RESULT(no)
+    fi
+    AC_SUBST(A2X_LATEX_ENCODING)
+    rm -f $temp_asciidoc ${temp_asciidoc%.txt}.pdf
 
     AC_PATH_PROG(DBLATEX,dblatex,"none")
     if ( test "none" = "$DBLATEX" ) ; then
@@ -950,11 +1054,6 @@ if ( test "$BUILD_DOCS_PDF" = "yes" ) ; then
     if ( test "none" = "$PDFLATEX" ) ; then
 	AC_MSG_ERROR([no pdflatex, PDF documentation cannot be built])
     fi
-
-    AC_PATH_PROG(EPSTOPDF,epstopdf,"none")
-    if ( test "none" = "$EPSTOPDF" ) ; then
-	AC_MSG_ERROR([no epstopdf, PDF documentation cannot be built])
-    fi
 fi
 
 # Programs required only for building the HTML documentation
@@ -979,48 +1078,6 @@ fi
 AC_SUBST(BUILD_DOCS)
 AC_SUBST(BUILD_DOCS_PDF)
 AC_SUBST(BUILD_DOCS_HTML)
-
-##############################################################################
-# Subsection 3.8                                                             #
-# check for additional realtime packages to enable optional components       #
-# which depends on them                                                      #
-##############################################################################
-
-# check for ethercat dev files and enable ethercat hal driver
-AC_MSG_CHECKING([for ethercat master dev files])
-
-CONFIG_LCEC=n
-LCEC_SYMBOLS=""
-rm -f "${BUILD_TOPLEVEL}/src/hal/drivers/ethercat/ecrt.h"
-
-# ideal case: dev-package installed
-if test -e "$RTDIR/include/ecrt.h"; then
-    CONFIG_LCEC=m
-else
-    # try to find ethercat include file somwhere else
-    for i in /usr/include/ecrt.h /usr/local/include/ecrt.h; do
-        if test -e $i; then
-            CONFIG_LCEC=m
-            # hack to avoid adding /usr/include to the module build include path
-            ln -s $i "${BUILD_TOPLEVEL}/src/hal/drivers/ethercat/ecrt.h"
-            break
-        fi
-    done
-fi
-
-if test "$CONFIG_LCEC" = "m"; then
-    # try to find symbol file
-    if test -e $MODULE_DIR/ethercat/Module.symvers; then
-        LCEC_SYMBOLS=$MODULE_DIR/ethercat/Module.symvers
-    fi
-
-    AC_MSG_RESULT([found, hal driver enabled])
-else
-    AC_MSG_RESULT([not found, hal driver disabled])
-fi
-
-AC_SUBST(CONFIG_LCEC)
-AC_SUBST(LCEC_SYMBOLS)
 
 #############################################################################
 # Section 4 - Check for math support                                         #
@@ -1633,6 +1690,20 @@ Install this version and specify --with-tclConfig and --with-tkConfig if necessa
     AC_CHECK_HEADERS(X11/Xmu/Xmu.h,[],[AC_MSG_ERROR([Required Xmu header missing.  Install it, or specify --disable-python to skip the parts of LinuxCNC that depend on Python])])
 fi
 
+AC_MSG_CHECKING(libgl1-mesa-dri workaround)
+
+PRELOAD_WORKAROUND=`../scripts/test-libgl-bug.sh 2>/dev/null`
+if test  $? -ne 0 ; then
+   # real bad, the test failed - let me know
+   AC_MSG_RESULT([test for libgl1-mesa-dri workaround failed, please file a bug])
+   exit 1
+fi
+if test "x$PRELOAD_WORKAROUND" != "x" ; then
+   AC_MSG_RESULT(required - need to preload $PRELOAD_WORKAROUND)
+else
+   AC_MSG_RESULT(not required)
+fi
+
 AC_SUBST([BUILD_PYTHON])
 AC_SUBST([LIBPYTHON])
 AC_SUBST([INCLUDEPY])
@@ -1649,15 +1720,13 @@ AC_CONFIG_FILES([../scripts/halrun], [chmod +x ../scripts/halrun])
 AC_CONFIG_FILES([../scripts/rip-environment], [chmod +x ../scripts/rip-environment])
 AC_CONFIG_FILES([../scripts/haltcl], [chmod +x ../scripts/haltcl])
 AC_CONFIG_FILES([../scripts/realtime], [chmod +x ../scripts/realtime])
-AC_CONFIG_FILES([../scripts/latencyplot], [chmod +x ../scripts/latencyplot])
-AC_CONFIG_FILES([../scripts/latencyhistogram], [chmod +x ../scripts/latencyhistogram])
+AC_CONFIG_FILES([../scripts/linuxcnc_var], [chmod +x ../scripts/linuxcnc_var])
 AC_CONFIG_FILES(Makefile.inc)
 AC_CONFIG_FILES(Makefile.modinc)
 AC_CONFIG_FILES(../tcl/linuxcnc.tcl)
 AC_CONFIG_FILES(../lib/python/nf.py)
 AC_CONFIG_FILES([../scripts/linuxcncmkdesktop], [chmod +x ../scripts/linuxcncmkdesktop])
 AC_CONFIG_FILES(../share/applications/linuxcnc-latency.desktop)
-AC_CONFIG_FILES(../share/applications/linuxcnc-latencyplot.desktop)
 AC_CONFIG_FILES(../share/applications/linuxcnc.desktop)
 AC_CONFIG_FILES(../share/desktop-directories/cnc.directory)
 AC_CONFIG_FILES(../share/menus/CNC.menu)

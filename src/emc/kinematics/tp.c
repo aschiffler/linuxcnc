@@ -7,7 +7,7 @@
 * Author:
 * License: GPL Version 2
 * System: Linux
-*
+*    
 * Copyright (c) 2004 All rights reserved.
 ********************************************************************/
 
@@ -21,6 +21,7 @@
 #include "hal.h"
 #include "../motion/mot_priv.h"
 #include "motion_debug.h"
+#include "motion_types.h"
 
 extern emcmot_status_t *emcmotStatus;
 extern emcmot_debug_t *emcmotDebug;
@@ -117,7 +118,7 @@ int tpInit(TP_STRUCT * tp)
     tp->wDotMax = 0.0;
 
     ZERO_EMC_POSE(tp->currentPos);
-
+    
     return tpClear(tp);
 }
 
@@ -136,7 +137,7 @@ int tpSetCycleTime(TP_STRUCT * tp, double secs)
 // vMax (the velocity requested by the F word) and
 // ini_maxvel, the max velocity possible before meeting
 // a machine constraint caused by an AXIS's max velocity.
-// (the TP is allowed to go up to this high when feed
+// (the TP is allowed to go up to this high when feed 
 // override >100% is requested)  These settings apply to
 // subsequent moves until changed.
 
@@ -161,7 +162,7 @@ int tpSetVlimit(TP_STRUCT * tp, double vLimit)
 {
     if (!tp) return -1;
 
-    if (vLimit < 0.)
+    if (vLimit < 0.) 
         tp->vLimit = 0.;
     else
         tp->vLimit = vLimit;
@@ -196,7 +197,7 @@ int tpSetId(TP_STRUCT * tp, int id)
 	rtapi_print_msg(RTAPI_MSG_ERR, "tpSetId: invalid motion id %d\n", id);
 	return -1;
     }
-
+	
     if (0 == tp) {
 	return -1;
     }
@@ -242,7 +243,7 @@ int tpSetTermCond(TP_STRUCT * tp, int cond, double tolerance)
 }
 
 // Used to tell the tp the initial position.  It sets
-// the current position AND the goal position to be the same.
+// the current position AND the goal position to be the same.  
 // Used only at TP initialization and when switching modes.
 
 int tpSetPos(TP_STRUCT * tp, EmcPose pos)
@@ -257,8 +258,8 @@ int tpSetPos(TP_STRUCT * tp, EmcPose pos)
     return 0;
 }
 
-int tpAddRigidTap(TP_STRUCT *tp, EmcPose end, double vel, double ini_maxvel,
-                  double acc, unsigned char enables) {
+int tpAddRigidTap(TP_STRUCT *tp, EmcPose end, double vel, double ini_maxvel, 
+                  double acc, double jerk, unsigned char enables) {
     TC_STRUCT tc;
     PmLine line_xyz;
     PmPose start_xyz, end_xyz;
@@ -279,7 +280,7 @@ int tpAddRigidTap(TP_STRUCT *tp, EmcPose end, double vel, double ini_maxvel,
 
     start_xyz.rot = identity_quat;
     end_xyz.rot = identity_quat;
-
+    
     // abc cannot move
     abc.x = tp->goalPos.a;
     abc.y = tp->goalPos.b;
@@ -301,13 +302,14 @@ int tpAddRigidTap(TP_STRUCT *tp, EmcPose end, double vel, double ini_maxvel,
     tc.progress = 0.0;
     tc.reqvel = vel;
     tc.maxaccel = acc;
+    tc.jerk = jerk;
     tc.feed_override = 0.0;
     tc.maxvel = ini_maxvel;
     tc.id = tp->nextId;
     tc.active = 0;
     tc.atspeed = 1;
 
-    tc.currentvel = 0.0;
+    tc.cur_vel = 0.0;
     tc.blending = 0;
     tc.blend_vel = 0.0;
     tc.vel_at_blend_start = 0.0;
@@ -326,7 +328,7 @@ int tpAddRigidTap(TP_STRUCT *tp, EmcPose end, double vel, double ini_maxvel,
         return -1;
     }
     tc.synchronized = tp->synchronized;
-
+    
     tc.uu_per_rev = tp->uu_per_rev;
     tc.velocity_mode = tp->velocity_mode;
     tc.enables = enables;
@@ -343,7 +345,7 @@ int tpAddRigidTap(TP_STRUCT *tp, EmcPose end, double vel, double ini_maxvel,
         rtapi_print_msg(RTAPI_MSG_ERR, "tcqPut failed.\n");
 	return -1;
     }
-
+    
     // do not change tp->goalPos here,
     // since this move will end just where it started
 
@@ -359,7 +361,8 @@ int tpAddRigidTap(TP_STRUCT *tp, EmcPose end, double vel, double ini_maxvel,
 // of the previous move to the new end specified here at the
 // currently-active accel and vel settings from the tp struct.
 
-int tpAddLine(TP_STRUCT * tp, EmcPose end, int type, double vel, double ini_maxvel, double acc, unsigned char enables, char atspeed, int indexrotary)
+int tpAddLine(TP_STRUCT * tp, EmcPose end, int type, double vel, double ini_maxvel, double acc, double jerk,
+              unsigned char enables, char atspeed, int indexrotary)
 {
     TC_STRUCT tc;
     PmLine line_xyz, line_uvw, line_abc;
@@ -408,7 +411,7 @@ int tpAddLine(TP_STRUCT * tp, EmcPose end, int type, double vel, double ini_maxv
     tc.sync_accel = 0;
     tc.cycle_time = tp->cycleTime;
 
-    if (!line_xyz.tmag_zero)
+    if (!line_xyz.tmag_zero) 
         tc.target = line_xyz.tmag;
     else if (!line_uvw.tmag_zero)
         tc.target = line_uvw.tmag;
@@ -416,15 +419,19 @@ int tpAddLine(TP_STRUCT * tp, EmcPose end, int type, double vel, double ini_maxv
         tc.target = line_abc.tmag;
 
     tc.progress = 0.0;
+    tc.accel_state = ACCEL_S3;
+    tc.distance_to_go = tc.target;
     tc.reqvel = vel;
-    tc.maxaccel = acc;
+    tc.maxvel = ini_maxvel * tp->cycleTime;
+    tc.maxaccel = acc * tp->cycleTime * tp->cycleTime;
+    tc.jerk = jerk * tp->cycleTime * tp->cycleTime * tp->cycleTime;
     tc.feed_override = 0.0;
-    tc.maxvel = ini_maxvel;
     tc.id = tp->nextId;
     tc.active = 0;
     tc.atspeed = atspeed;
 
-    tc.currentvel = 0.0;
+    tc.cur_accel = 0.0;
+    tc.cur_vel = 0.0;
     tc.blending = 0;
     tc.blend_vel = 0.0;
     tc.vel_at_blend_start = 0.0;
@@ -475,7 +482,7 @@ int tpAddLine(TP_STRUCT * tp, EmcPose end, int type, double vel, double ini_maxv
 
 int tpAddCircle(TP_STRUCT * tp, EmcPose end,
 		PmCartesian center, PmCartesian normal, int turn, int type,
-                double vel, double ini_maxvel, double acc, unsigned char enables, char atspeed)
+                double vel, double ini_maxvel, double acc, double jerk, unsigned char enables, char atspeed)
 {
     TC_STRUCT tc;
     PmCircle circle;
@@ -487,7 +494,7 @@ int tpAddCircle(TP_STRUCT * tp, EmcPose end,
     double helix_length;
     PmQuaternion identity_quat = { 1.0, 0.0, 0.0, 0.0 };
 
-    if (!tp || tp->aborting)
+    if (!tp || tp->aborting) 
 	return -1;
 
     start_xyz.tran = tp->goalPos.tran;
@@ -527,15 +534,19 @@ int tpAddCircle(TP_STRUCT * tp, EmcPose end,
     tc.cycle_time = tp->cycleTime;
     tc.target = helix_length;
     tc.progress = 0.0;
+    tc.accel_state = ACCEL_S3;
+    tc.distance_to_go = tc.target;
     tc.reqvel = vel;
-    tc.maxaccel = acc;
+    tc.maxvel = ini_maxvel * tp->cycleTime;
+    tc.maxaccel = acc * tp->cycleTime * tp->cycleTime;
+    tc.jerk = jerk * tp->cycleTime * tp->cycleTime * tp->cycleTime;
     tc.feed_override = 0.0;
-    tc.maxvel = ini_maxvel;
     tc.id = tp->nextId;
     tc.active = 0;
     tc.atspeed = atspeed;
 
-    tc.currentvel = 0.0;
+    tc.cur_accel = 0.0;
+    tc.cur_vel = 0.0;
     tc.blending = 0;
     tc.blend_vel = 0.0;
     tc.vel_at_blend_start = 0.0;
@@ -553,7 +564,7 @@ int tpAddCircle(TP_STRUCT * tp, EmcPose end,
     tc.uu_per_rev = tp->uu_per_rev;
     tc.enables = enables;
     tc.indexrotary = -1;
-
+    
     if (syncdio.anychanged != 0) {
 	tc.syncdio = syncdio; //enqueue the list of DIOs that need toggling
 	tpClearDIOs(); // clear out the list, in order to prepare for the next time we need to use it
@@ -575,56 +586,464 @@ int tpAddCircle(TP_STRUCT * tp, EmcPose end,
 }
 
 void tcRunCycle(TP_STRUCT *tp, TC_STRUCT *tc, double *v, int *on_final_decel) {
-    double discr, maxnewvel, newvel, newaccel=0;
-    if(!tc->blending) tc->vel_at_blend_start = tc->currentvel;
+    double t, t1, vel, v1, dist, req_vel;
+    int immediate_state;
+    double tc_target;
+    
+    tc_target = tc->target;
 
-    discr = 0.5 * tc->cycle_time * tc->currentvel - (tc->target - tc->progress);
-    if(discr > 0.0) {
-        // should never happen: means we've overshot the target
-        newvel = maxnewvel = 0.0;
-    } else {
-        discr = 0.25 * pmSq(tc->cycle_time) - 2.0 / tc->maxaccel * discr;
-        newvel = maxnewvel = -0.5 * tc->maxaccel * tc->cycle_time +
-            tc->maxaccel * pmSqrt(discr);
-    }
-    if(newvel <= 0.0) {
-        // also should never happen - if we already finished this tc, it was
-        // caught above
-        newvel = newaccel = 0.0;
-        tc->progress = tc->target;
-    } else {
-        // constrain velocity
-        if(newvel > tc->reqvel * tc->feed_override)
-            newvel = tc->reqvel * tc->feed_override;
-        if(newvel > tc->maxvel) newvel = tc->maxvel;
-
-        // if the motion is not purely rotary axes (and therefore in angular units) ...
-        if(!(tc->motion_type == TC_LINEAR && tc->coords.line.xyz.tmag_zero && tc->coords.line.uvw.tmag_zero)) {
-            // ... clamp motion's velocity at TRAJ MAX_VELOCITY (tooltip maxvel)
-            // except when it's synced to spindle position.
-            if((!tc->synchronized || tc->velocity_mode) && newvel > tp->vLimit) {
-                newvel = tp->vLimit;
+    immediate_state = 0;
+    do {
+        switch (tc->accel_state) {
+        case ACCEL_S0:
+            // AT = AT + JT
+            // VT = VT + AT + 1/2JT
+            // PT = PT + VT + 1/2AT + 1/6JT
+            tc->cur_accel = tc->cur_accel + tc->jerk;
+            tc->cur_vel = tc->cur_vel + tc->cur_accel + 0.5 * tc->jerk;
+            tc->progress = tc->progress + tc->cur_vel + 0.5 * tc->cur_accel + 1.0/6.0 * tc->jerk;
+            
+            // check if we hit accel limit at next BP
+            if ((tc->cur_accel + tc->jerk) >= tc->maxaccel) {
+                tc->cur_accel = tc->maxaccel;
+                tc->accel_state = ACCEL_S1;
+                break;
             }
+            
+            // check if we will hit velocity limit; 
+            // assume we start decel from here to "accel == 0"
+            //
+            // AT = A0 + JT (let AT = 0 to calculate T)
+            // VT = V0 + A0T + 1/2JT2
+            t = ceil(tc->cur_accel / tc->jerk);
+            req_vel = tc->reqvel * tc->feed_override * tc->cycle_time;
+            if (req_vel > tc->maxvel) {
+                req_vel = tc->maxvel;
+            }
+            vel = req_vel - tc->cur_accel * t + 0.5 * tc->jerk * t * t;
+            if (tc->cur_vel >= vel) {
+                tc->accel_state = ACCEL_S2;
+                break;
+            }
+
+            // check if we will hit progress limit
+            // AT = AT + JT
+            // VT = V0 + A0T + 1/2 JT^2
+            // PT = P0 + V0T + 1/2A0T^2 + 1/6JT^3
+            // distance for S2
+            t = ceil(tc->cur_accel/tc->jerk);
+            dist = tc->progress + tc->cur_vel * t + 0.5 * tc->cur_accel * t * t
+                   - 1.0/6.0 * tc->jerk * t * t * t;
+            vel = tc->cur_vel + tc->cur_accel * t - 0.5 * tc->jerk * t * t;
+            // distance for S3
+            dist += (vel);
+            
+            /* 
+            0.5 * vel = vel + 0 * t1 - 0.5 * j * t1 * t1;
+            t1 = sqrt(vel/j)
+            */
+            t = ceil(sqrt(vel/tc->jerk));
+            // AT = AT + JT
+            t1 = ceil(tc->maxaccel / tc->jerk);   // max time for S4
+            if (t > t1) {
+                // S4 -> S5 -> S6
+                dist += t1 * vel;    // dist of (S4 + S6)
+                // calc decel.dist for ACCEL_S5
+                // t: time for S5
+                t = (vel - tc->jerk * t1 * t1) / tc->maxaccel;
+                v1 = vel - 0.5 * tc->jerk * t1 * t1;
+                // PT = P0 + V0T + 1/2A0T^2 + 1/6JT^3
+                dist += (v1 * t - 0.5 * tc->maxaccel * t * t);
+            } else {
+                // S4 -> S6
+                dist += t * vel;    // dist of (S4 + S6)
+            }
+
+            if (tc_target < dist) {
+                tc->accel_state = ACCEL_S2;
+                break;
+            }
+
+            break;
+        
+        case ACCEL_S1:
+            // jerk is 0 at this state
+            // VT = VT + AT + 1/2JT
+            // PT = PT + VT + 1/2AT + 1/6JT
+            tc->cur_vel = tc->cur_vel + tc->cur_accel;
+            tc->progress = tc->progress + tc->cur_vel + 0.5 * tc->cur_accel;
+            
+            // check if we will hit velocity limit; 
+            // assume we start decel from here to "accel == 0"
+            //
+            // AT = A0 + JT (let AT = 0 to calculate T)
+            // VT = V0 + A0T + 1/2JT2
+            // t = ceil(tc->cur_accel / tc->jerk);
+            t = tc->cur_accel / tc->jerk;
+            req_vel = tc->reqvel * tc->feed_override * tc->cycle_time;
+            if (req_vel > tc->maxvel) {
+                req_vel = tc->maxvel;
+            }
+            vel = req_vel - tc->cur_accel * t + 0.5 * tc->jerk * t * t;
+            if (tc->cur_vel >= vel) {
+                tc->accel_state = ACCEL_S2;
+                break;
+            }
+            
+            // check if we will hit progress limit
+            // distance for S2
+            t = ceil(tc->cur_accel/tc->jerk);
+            dist = tc->progress + tc->cur_vel * t + 0.5 * tc->cur_accel * t * t
+                   - 1.0/6.0 * tc->jerk * t * t * t;
+            vel = tc->cur_vel + tc->cur_accel * t - 0.5 * tc->jerk * t * t;
+            // distance for S3
+            dist += (vel);
+            
+            /* 
+            0.5 * vel = vel + 0 * t1 - 0.5 * j * t1 * t1;
+            t1 = sqrt(vel/j)
+            */
+            t = ceil(sqrt(vel/tc->jerk));
+            // AT = AT + JT
+            t1 = ceil(tc->maxaccel / tc->jerk);   // max time for S4
+            if (t > t1) {
+                // S4 -> S5 -> S6
+                dist += t1 * vel;    // dist of (S4 + S6)
+                // calc decel.dist for ACCEL_S5
+                // t: time for S5
+                t = (vel - tc->jerk * t1 * t1) / tc->maxaccel;
+                v1 = vel - 0.5 * tc->jerk * t1 * t1;
+                // PT = P0 + V0T + 1/2A0T^2 + 1/6JT^3
+                dist += (v1 * t - 0.5 * tc->maxaccel * t * t);
+            } else {
+                // S4 -> S6
+                dist += t * vel;    // dist of (S4 + S6)
+            }
+
+            if (tc_target < dist) {
+                tc->accel_state = ACCEL_S2;
+                break;
+            }
+            break;
+        
+        
+        case ACCEL_S2: 
+            // to DECELERATE to ACCEL==0
+            
+            // AT = AT + JT
+            // VT = VT + AT + 1/2JT
+            // PT = PT + VT + 1/2AT + 1/6JT
+            tc->cur_accel = tc->cur_accel - tc->jerk;
+            tc->cur_vel = tc->cur_vel + tc->cur_accel - 0.5 * tc->jerk;
+            tc->progress = tc->progress + tc->cur_vel + 0.5 * tc->cur_accel - 1.0/6.0 * tc->jerk;
+           
+            // check accel == 0
+            if (tc->cur_accel <= 0) {
+                tc->accel_state = ACCEL_S3;
+                break;
+            }
+
+            // check if we will hit velocity limit at next BP
+            req_vel = tc->reqvel * tc->feed_override * tc->cycle_time;
+            if (req_vel > tc->maxvel) {
+                req_vel = tc->maxvel;
+            }
+            // vel: velocity at next BP 
+            vel = tc->cur_vel + tc->cur_accel - 1.5 * tc->jerk;
+            if (vel > req_vel) {
+                tc->cur_vel = vel;
+                tc->accel_state = ACCEL_S3;
+                break;
+            } 
+            
+            // check if we will hit progress limit
+            // refer to 2011-10-17 ysli design note
+            // AT = AT + JT
+            // VT = V0 + A0T + 1/2 JT^2
+            // PT = P0 + V0T + 1/2A0T^2 + 1/6JT^3
+            vel = tc->cur_vel;
+            // distance for S3
+            dist = tc->progress + (vel);
+            
+            /* 
+            0.5 * vel = vel + 0 * t1 - 0.5 * j * t1 * t1;
+            t1 = sqrt(vel/j)
+            */
+            t = ceil(sqrt(vel/tc->jerk));
+            // AT = AT + JT
+            t1 = ceil(tc->maxaccel / tc->jerk);   // max time for S4
+            if (t > t1) {
+                // S4 -> S5 -> S6
+                dist += t1 * vel;    // dist of (S4 + S6)
+                // calc decel.dist for ACCEL_S5
+                // t: time for S5
+                t = (vel - tc->jerk * t1 * t1) / tc->maxaccel;
+                v1 = vel - 0.5 * tc->jerk * t1 * t1;
+                // PT = P0 + V0T + 1/2A0T^2 + 1/6JT^3
+                dist += (v1 * t - 0.5 * tc->maxaccel * t * t);
+            } else {
+                // S4 -> S6
+                dist += t * vel;    // dist of (S4 + S6)
+            }
+
+            if (tc_target < dist) {
+                tc->accel_state = ACCEL_S3;
+                break;
+            }
+
+            break;
+        
+        case ACCEL_S3:
+            // PT = PT + VT + 1/2AT + 1/6JT
+            // , where (jerk == 0) and (accel == 0)
+            tc->cur_accel = 0;
+            tc->progress = tc->progress + tc->cur_vel;
+            
+            // check if we will hit progress limit
+            // refer to 2011-10-17 ysli design note
+            // AT = AT + JT
+            // VT = V0 + A0T + 1/2 JT^2
+            // PT = P0 + V0T + 1/2A0T^2 + 1/6JT^3
+            /* 
+            0.5 * vel = vel + 0 * t1 - 0.5 * j * t1 * t1;
+            t1 = sqrt(vel/j)
+            */
+            vel = tc->cur_vel;
+            // t = floor(sqrt(vel/tc->jerk) - 0.5);
+            t = sqrt(vel/tc->jerk);
+            // t = sqrt(vel/tc->jerk);
+            // AT = AT + JT
+            // t1 = floor(tc->maxaccel / tc->jerk - 0.5);   // max time for S4
+            t1 = tc->maxaccel / tc->jerk;   // max time for S4
+            // t1 = tc->maxaccel / tc->jerk;   // max time for S4
+            if (t > t1) {
+                // S4 -> S5 -> S6
+                dist = tc->progress + t1 * vel;    // dist of (S4 + S6)
+                // calc decel.dist for ACCEL_S5
+                // t: time for S5
+                // t = floor((vel - tc->maxaccel * t1) / tc->maxaccel - 0.5);
+                t = (vel - tc->maxaccel * t1) / tc->maxaccel - 0.5;
+                // t = (vel - tc->maxaccel * t1) / tc->maxaccel;
+                v1 = vel - 0.5 * tc->jerk * t1 * t1;
+                // PT = P0 + V0T + 1/2A0T^2 + 1/6JT^3
+                dist += (v1 * t - 0.5 * tc->maxaccel * t * t);
+            } else {
+                // S4 -> S6
+                dist = tc->progress + t * vel;    // dist of (S4 + S6)
+            }
+
+            // check if dist would be greater than tc_target at next cycle
+            if (tc_target < (dist - vel)) {
+                tc->accel_state = ACCEL_S4;
+                // blending at largest velocity for G64 w/o P<tolerance>
+                if (!tc->tolerance) {
+                    tc->tolerance = tc->target - tc->progress; // tc->distance_to_go
+                } 
+                break;
+            }
+
+            // check for changes of feed_override and request-velocity
+            req_vel = tc->reqvel * tc->feed_override * tc->cycle_time;
+            if (req_vel > tc->maxvel) {
+                req_vel = tc->maxvel;
+            }
+            if ((tc->cur_vel + 1.5 * tc->jerk) < req_vel) {
+                tc->accel_state = ACCEL_S0;
+                break;
+            } else if ((tc->cur_vel - 1.5 * tc->jerk) > req_vel) {
+                tc->accel_state = ACCEL_S4;
+                break;
+            }
+            tc->cur_vel = req_vel;
+            break;
+
+
+        case ACCEL_S4:
+            // AT = AT + JT
+            // VT = VT + AT + 1/2JT
+            // PT = PT + VT + 1/2AT + 1/6JT
+            tc->cur_accel = tc->cur_accel - tc->jerk;
+            tc->cur_vel = tc->cur_vel + tc->cur_accel - 0.5 * tc->jerk;
+            if (tc->cur_vel <= 0) {
+                tc->cur_vel = 0;
+                tc->accel_state = ACCEL_S3;
+                break;
+            }
+            tc->progress = tc->progress + tc->cur_vel + 0.5 * tc->cur_accel - 1.0/6.0 * tc->jerk;
+
+            // (accel < 0) and (jerk < 0)
+           
+            // check if we hit accel limit at next BP
+            if ((tc->cur_accel - tc->jerk) <= -tc->maxaccel) {
+                tc->cur_accel = -tc->maxaccel;
+                tc->accel_state = ACCEL_S5;
+                break;
+            }
+            
+            // should we stay in S4 and keep decel?
+            // calculate dist for S6 -> S4 -> (maybe S5) -> S6
+            t = - tc->cur_accel / tc->jerk;
+            // target dist after switching to S6 (jerk is positive for S6)
+            dist = tc->progress + tc->cur_vel * t 
+                   + 0.5 * tc->cur_accel * t * t
+                   + 1.0 / 6.0 * tc->jerk * t * t * t;
+            // VT = V0 + A0T + 1/2JT2
+            // obtain vel for S6 -> S3
+            vel = tc->cur_vel + tc->cur_accel * t + 0.5 * tc->jerk * t * t;
+            
+            if (vel > 0) {    
+                /* 
+                0.5 * vel = vel + 0 * t1 - 0.5 * j * t1 * t1;
+                t1 = sqrt(vel/j)
+                */
+                t = ceil(sqrt(vel/tc->jerk));
+                // AT = AT + JT
+                t1 = ceil(tc->maxaccel / tc->jerk);   // max time for S4
+                if (t > t1) {
+                    // S4 -> S5 -> S6
+                    dist += t1 * vel;    // dist of (S4 + S6)
+                    // calc decel.dist for ACCEL_S5
+                    // t: time for S5
+                    t = (vel - tc->jerk * t1 * t1) / tc->maxaccel;
+                    v1 = vel - 0.5 * tc->jerk * t1 * t1;
+                    // PT = P0 + V0T + 1/2A0T^2 + 1/6JT^3
+                    dist += (v1 * t - 0.5 * tc->maxaccel * t * t);
+                } else {
+                    // S4 -> S6
+                    dist += t * vel;    // dist of (S4 + S6)
+                }
+            }
+
+            // check if dist would be greater than tc_target at next cycle
+            if (tc_target < (dist - (tc->cur_vel + 1.5 * tc->cur_accel - 2.1666667 * tc->jerk))) {
+                tc->accel_state = ACCEL_S4;
+//                DPS("should stay in S4 and keep decel\n");
+                break;
+            }
+                    
+            // check if we will approaching requested velocity
+            // vel should not be greater than "request velocity" after
+            // starting acceleration to "accel == 0".
+            //
+            // AT = A0 + JT (let AT = 0 to calculate T)
+            // VT = V0 + A0T + 1/2JT2
+            t = - tc->cur_accel / tc->jerk;
+            req_vel = tc->reqvel * tc->feed_override * tc->cycle_time;
+            if (req_vel > tc->maxvel) {
+                req_vel = tc->maxvel;
+            }
+            if ((tc->cur_vel + tc->cur_accel * t + 0.5 * tc->jerk * t * t) <= req_vel) {
+                tc->accel_state = ACCEL_S6;
+//                DPS("S4: hit velocity rule; move to S6\n");
+                break;
+            }
+            
+            break;
+        
+        case ACCEL_S5:
+            // jerk is 0 at this state
+            // accel < 0
+            // VT = VT + AT + 1/2JT
+            // PT = PT + VT + 1/2AT + 1/6JT
+            tc->cur_vel = tc->cur_vel + tc->cur_accel;
+            tc->progress = tc->progress + tc->cur_vel + 0.5 * tc->cur_accel;
+            
+            // should we stay in S5 and keep decel?
+            // calculate dist for S6 -> S4 -> (maybe S5) -> S6
+            t = - tc->cur_accel / tc->jerk;
+            // target dist after switching to S6 (jerk is positive for S6)
+            dist = tc->progress + tc->cur_vel * t 
+                   + 0.5 * tc->cur_accel * t * t
+                   + 1.0 / 6.0 * tc->jerk * t * t * t;
+            // VT = V0 + A0T + 1/2JT2
+            // obtain vel for S6 -> S3
+            vel = tc->cur_vel + tc->cur_accel * t + 0.5 * tc->jerk * t * t;
+            
+            if (vel > 0) { 
+                /* S6 -> S3 -> S4 -> S5(maybe) -> S6 */
+                /* 
+                0.5 * vel = vel + 0 * t1 - 0.5 * j * t1 * t1;
+                t1 = sqrt(vel/j)
+                */
+                t = ceil(sqrt(vel/tc->jerk));
+                // AT = AT + JT
+                t1 = ceil(tc->maxaccel / tc->jerk);   // max time for S4
+                if (t > t1) {
+                    // S4 -> S5 -> S6
+                    dist += t1 * vel;    // dist of (S4 + S6)
+                    // calc decel.dist for ACCEL_S5
+                    // t: time for S5
+                    t = (vel - tc->jerk * t1 * t1) / tc->maxaccel;
+                    v1 = vel - 0.5 * tc->jerk * t1 * t1;
+                    // PT = P0 + V0T + 1/2A0T^2 + 1/6JT^3
+                    dist += (v1 * t - 0.5 * tc->maxaccel * t * t);
+                } else {
+                    // S4 -> S6
+                    dist += t * vel;    // dist of (S4 + S6)
+                }
+            }
+            
+            // check if dist would be greater than tc_target at next cycle
+            if (tc_target < (dist - (tc->cur_vel + 1.5 * tc->cur_accel))) {
+                tc->accel_state = ACCEL_S5;
+//                DPS("should stay in S5 and keep decel\n");
+                break;
+            }
+
+            // check if we will approaching requested velocity
+            // vel should not be greater than "request velocity" after
+            // starting acceleration to "accel == 0".
+            //
+            // AT = A0 + JT (let AT = 0 to calculate T)
+            // VT = V0 + A0T + 1/2JT2
+            // t: cycles for accel to decel to 0
+            t = - tc->cur_accel / tc->jerk;
+            req_vel = tc->reqvel * tc->feed_override * tc->cycle_time;
+            if (req_vel > tc->maxvel) {
+                req_vel = tc->maxvel;
+            }
+            if ((tc->cur_vel + tc->cur_accel * t + 0.5 * tc->jerk * t * t) <= req_vel) {
+                tc->accel_state = ACCEL_S6;
+                break;
+            }
+
+            break;
+        
+        case ACCEL_S6:
+            // AT = AT + JT
+            // VT = VT + AT + 1/2JT
+            // PT = PT + VT + 1/2AT + 1/6JT
+            tc->cur_accel = tc->cur_accel + tc->jerk;
+            tc->cur_vel = tc->cur_vel + tc->cur_accel + 0.5 * tc->jerk;
+            if (tc->cur_vel <= 0) {
+                tc->cur_accel = 0;
+                tc->cur_vel = 0.5 * tc->jerk;   // give some velocity for approaching target
+            }
+            dist = tc->cur_vel + 0.5 * tc->cur_accel + 1.0/6.0 * tc->jerk;
+            tc->progress = tc->progress + dist;
+
+            if (tc->cur_accel >= 0) {
+                tc->accel_state = ACCEL_S3;
+            }
+            
+            break;
+        
+        default:
+         break;
+//            assert(0);
+        } // switch (tc->accel_state)
+    } while (immediate_state);
+    
+        if (tc->progress >= tc->target) {
+            // finished
+            tc->progress = tc->target;
+            tc->cur_accel = 0;
+            tc->cur_vel = 0;
         }
 
-        // get resulting acceleration
-        newaccel = (newvel - tc->currentvel) / tc->cycle_time;
-
-        // constrain acceleration and get resulting velocity
-        if(newaccel > 0.0 && newaccel > tc->maxaccel) {
-            newaccel = tc->maxaccel;
-            newvel = tc->currentvel + newaccel * tc->cycle_time;
-        }
-        if(newaccel < 0.0 && newaccel < -tc->maxaccel) {
-            newaccel = -tc->maxaccel;
-            newvel = tc->currentvel + newaccel * tc->cycle_time;
-        }
-        // update position in this tc
-        tc->progress += (newvel + tc->currentvel) * 0.5 * tc->cycle_time;
-    }
-    tc->currentvel = newvel;
-    if(v) *v = newvel;
-    if(on_final_decel) *on_final_decel = fabs(maxnewvel - newvel) < 0.001;
+    if(v) *v = tc->cur_vel;
+    if(on_final_decel) *on_final_decel = fabs(tc->reqvel - tc->cur_vel) < 0.001;
+    tc->distance_to_go = tc->target - tc->progress;
 }
 
 
@@ -732,7 +1151,7 @@ int tpRunCycle(TP_STRUCT * tp, long period)
     // now we have the active tc.  get the upcoming one, if there is one.
     // it's not an error if there isn't another one - we just don't
     // do blending.  This happens in MDI for instance.
-    if(!emcmotDebug->stepping && tc->blend_with_next)
+    if(!emcmotDebug->stepping && tc->blend_with_next) 
         nexttc = tcqItem(&tp->queue, 1, period);
     else
         nexttc = NULL;
@@ -759,8 +1178,8 @@ int tpRunCycle(TP_STRUCT * tp, long period)
         // an abort message has come
         if( MOTION_ID_VALID(waiting_for_index) ||
 	    MOTION_ID_VALID(waiting_for_atspeed) ||
-            (tc->currentvel == 0.0 && !nexttc) ||
-            (tc->currentvel == 0.0 && nexttc && nexttc->currentvel == 0.0) ) {
+            (tc->cur_vel == 0.0 && !nexttc) || 
+            (tc->cur_vel == 0.0 && nexttc && nexttc->cur_vel == 0.0) ) {
             tcqInit(&tp->queue);
             tp->goalPos = tp->currentPos;
             tp->done = 1;
@@ -769,6 +1188,7 @@ int tpRunCycle(TP_STRUCT * tp, long period)
             tp->execId = 0;
             tp->motionType = 0;
             tp->synchronized = 0;
+            tc->accel_state = ACCEL_S3;
             waiting_for_index = MOTION_INVALID_ID;
             waiting_for_atspeed = MOTION_INVALID_ID;
             emcmotStatus->spindleSync = 0;
@@ -781,14 +1201,14 @@ int tpRunCycle(TP_STRUCT * tp, long period)
     }
 
     // this is no longer the segment we were waiting_for_index for
-    if (MOTION_ID_VALID(waiting_for_index) && waiting_for_index != tc->id)
+    if (MOTION_ID_VALID(waiting_for_index) && waiting_for_index != tc->id) 
     {
         rtapi_print_msg(RTAPI_MSG_ERR,
                 "Was waiting for index on motion id %d, but reached id %d\n",
                 waiting_for_index, tc->id);
         waiting_for_index = MOTION_INVALID_ID;
     }
-    if (MOTION_ID_VALID(waiting_for_atspeed) && waiting_for_atspeed != tc->id)
+    if (MOTION_ID_VALID(waiting_for_atspeed) && waiting_for_atspeed != tc->id)  
     {
 
         rtapi_print_msg(RTAPI_MSG_ERR,
@@ -813,7 +1233,7 @@ int tpRunCycle(TP_STRUCT * tp, long period)
         // wait for atspeed, if motion requested it.  also, force
         // atspeed check for the start of all spindle synchronized
         // moves.
-        if((tc->atspeed || (tc->synchronized && !tc->velocity_mode && !emcmotStatus->spindleSync)) &&
+        if((tc->atspeed || (tc->synchronized && !tc->velocity_mode && !emcmotStatus->spindleSync)) && 
            !emcmotStatus->spindle_is_atspeed) {
             waiting_for_atspeed = tc->id;
             return 0;
@@ -829,14 +1249,14 @@ int tpRunCycle(TP_STRUCT * tp, long period)
         }
 
         tc->active = 1;
-        tc->currentvel = 0;
+        tc->cur_vel = 0;
         tp->depth = tp->activeDepth = 1;
         tp->motionType = tc->canon_motion_type;
         tc->blending = 0;
 
         // honor accel constraint in case we happen to make an acute angle
         // with the next segment.
-        if(tc->blend_with_next)
+        if(tc->blend_with_next) 
             tc->maxaccel /= 2.0;
 
         if(tc->synchronized) {
@@ -861,7 +1281,7 @@ int tpRunCycle(TP_STRUCT * tp, long period)
             emcmotStatus->spindleSync = 1;
             waiting_for_index = MOTION_INVALID_ID;
             tc->sync_accel=1;
-            revs = 0.0;
+            revs=0;
         }
     }
 
@@ -884,7 +1304,7 @@ int tpRunCycle(TP_STRUCT * tp, long period)
                 PmLine *aux = &tc->coords.rigidtap.aux_xyz;
                 // we've stopped, so set a new target at the original position
                 tc->coords.rigidtap.spindlerevs_at_reversal = new_spindlepos + spindleoffset;
-
+                
                 pmLinePoint(&tc->coords.rigidtap.xyz, tc->progress, &start);
                 end = tc->coords.rigidtap.xyz.start;
                 pmLineInit(aux, start, end);
@@ -913,7 +1333,7 @@ int tpRunCycle(TP_STRUCT * tp, long period)
                 tc->progress = 0.0;
                 tc->synchronized = 0;
                 tc->reqvel = tc->maxvel;
-
+                
                 tc->coords.rigidtap.state = FINAL_PLACEMENT;
             }
             old_spindlepos = new_spindlepos;
@@ -931,7 +1351,7 @@ int tpRunCycle(TP_STRUCT * tp, long period)
     if(nexttc && nexttc->active == 0) {
         // this means this tc is being read for the first time.
 
-        nexttc->currentvel = 0;
+        nexttc->cur_vel = 0;
         tp->depth = tp->activeDepth = 1;
         nexttc->active = 1;
         nexttc->blending = 0;
@@ -959,10 +1379,10 @@ int tpRunCycle(TP_STRUCT * tp, long period)
             double new_spindlepos = emcmotStatus->spindleRevs;
             if (emcmotStatus->spindle.direction < 0) new_spindlepos = -new_spindlepos;
 
-            if(tc->motion_type == TC_RIGIDTAP &&
-               (tc->coords.rigidtap.state == RETRACTION ||
+            if(tc->motion_type == TC_RIGIDTAP && 
+               (tc->coords.rigidtap.state == RETRACTION || 
                 tc->coords.rigidtap.state == FINAL_REVERSAL))
-                revs = tc->coords.rigidtap.spindlerevs_at_reversal -
+                revs = tc->coords.rigidtap.spindlerevs_at_reversal - 
                     new_spindlepos;
             else
                 revs = new_spindlepos;
@@ -975,7 +1395,7 @@ int tpRunCycle(TP_STRUCT * tp, long period)
                 // acceleration will abruptly stop and we will be on our new target.
                 spindle_vel = revs/(tc->cycle_time * tc->sync_accel++);
                 target_vel = spindle_vel * tc->uu_per_rev;
-                if(tc->currentvel >= target_vel) {
+                if(tc->cur_vel >= target_vel) {
                     // move target so as to drive pos_error to 0 next cycle
                     spindleoffset = revs - tc->progress/tc->uu_per_rev;
                     tc->sync_accel = 0;
@@ -1012,22 +1432,29 @@ int tpRunCycle(TP_STRUCT * tp, long period)
 	    nexttc->feed_override = emcmotStatus->net_feed_scale;
 	}
     }
+    // if this is rapid move, don't use feed override settings (max velocity override is still honoured)
+    if(tc->canon_motion_type==EMC_MOTION_TYPE_TRAVERSE) {
+        tc->feed_override = 1.0;
+        if(nexttc) {
+        nexttc->feed_override = 1.0;
+        }
+    }
     /* handle pausing */
     if(tp->pausing && (!tc->synchronized || tc->velocity_mode)) {
         tc->feed_override = 0.0;
         if(nexttc) {
-	    nexttc->feed_override = 0.0;
-	}
+        nexttc->feed_override = 0.0;
+        }
     }
 
     // calculate the approximate peak velocity the nexttc will hit.
     // we know to start blending it in when the current tc goes below
     // this velocity...
     if(nexttc && nexttc->maxaccel) {
-        tc->blend_vel = nexttc->maxaccel *
+        tc->blend_vel = nexttc->maxaccel * 
             pmSqrt(nexttc->target / nexttc->maxaccel);
         if(tc->blend_vel > nexttc->reqvel * nexttc->feed_override) {
-            // segment has a cruise phase so let's blend over the
+            // segment has a cruise phase so let's blend over the 
             // whole accel period if possible
             tc->blend_vel = nexttc->reqvel * nexttc->feed_override;
         }
@@ -1039,7 +1466,7 @@ int tpRunCycle(TP_STRUCT * tp, long period)
              * is calculated from dot(s1,s2)
              *
              * blend criteria: we are decelerating at the end of segment s1
-             * and we pass distance d from the end.
+             * and we pass distance d from the end.  
              * find the corresponding velocity v when passing d.
              *
              * in the drawing note d = 2T/cos(theta)
@@ -1058,7 +1485,7 @@ int tpRunCycle(TP_STRUCT * tp, long period)
             v2 = tcGetStartingUnitVector(nexttc);
             pmCartCartDot(v1, v2, &dot);
 
-            theta = acos(-dot)/2.0;
+            theta = acos(-dot)/2.0; 
             if(cos(theta) > 0.001) {
                 tblend_vel = 2.0 * pmSqrt(tc->maxaccel * tc->tolerance / cos(theta));
                 if(tblend_vel < tc->blend_vel)
@@ -1070,7 +1497,7 @@ int tpRunCycle(TP_STRUCT * tp, long period)
     primary_before = tcGetPos(tc);
     tcRunCycle(tp, tc, &primary_vel, &on_final_decel);
     primary_after = tcGetPos(tc);
-    pmCartCartSub(primary_after.tran, primary_before.tran,
+    pmCartCartSub(primary_after.tran, primary_before.tran, 
             &primary_displacement.tran);
     primary_displacement.a = primary_after.a - primary_before.a;
     primary_displacement.b = primary_after.b - primary_before.b;
@@ -1081,16 +1508,16 @@ int tpRunCycle(TP_STRUCT * tp, long period)
     primary_displacement.w = primary_after.w - primary_before.w;
 
     // blend criteria
-    if((tc->blending && nexttc) ||
+    if((tc->blending && nexttc) || 
             (nexttc && on_final_decel && primary_vel < tc->blend_vel)) {
-        // make sure we continue to blend this segment even when its
+        // make sure we continue to blend this segment even when its 
         // accel reaches 0 (at the very end)
         tc->blending = 1;
 
         // hack to show blends in axis
         // tp->motionType = 0;
 
-        if(tc->currentvel > nexttc->currentvel) {
+        if(tc->cur_vel > nexttc->cur_vel) {
             target = tcGetEndpoint(tc);
             tp->motionType = tc->canon_motion_type;
 	    emcmotStatus->distance_to_go = tc->target - tc->progress;
@@ -1109,18 +1536,18 @@ int tpRunCycle(TP_STRUCT * tp, long period)
             emcmotStatus->requested_vel = nexttc->reqvel;
         }
 
-        emcmotStatus->current_vel = tc->currentvel + nexttc->currentvel;
+        emcmotStatus->current_vel = tc->cur_vel + nexttc->cur_vel;
 
         secondary_before = tcGetPos(nexttc);
         save_vel = nexttc->reqvel;
-        nexttc->reqvel = nexttc->feed_override > 0.0 ?
+        nexttc->reqvel = nexttc->feed_override > 0.0 ? 
             ((tc->vel_at_blend_start - primary_vel) / nexttc->feed_override) :
             0.0;
         tcRunCycle(tp, nexttc, NULL, NULL);
         nexttc->reqvel = save_vel;
 
         secondary_after = tcGetPos(nexttc);
-        pmCartCartSub(secondary_after.tran, secondary_before.tran,
+        pmCartCartSub(secondary_after.tran, secondary_before.tran, 
                 &secondary_displacement.tran);
         secondary_displacement.a = secondary_after.a - secondary_before.a;
         secondary_displacement.b = secondary_after.b - secondary_before.b;
@@ -1130,9 +1557,9 @@ int tpRunCycle(TP_STRUCT * tp, long period)
         secondary_displacement.v = secondary_after.v - secondary_before.v;
         secondary_displacement.w = secondary_after.w - secondary_before.w;
 
-        pmCartCartAdd(tp->currentPos.tran, primary_displacement.tran,
+        pmCartCartAdd(tp->currentPos.tran, primary_displacement.tran, 
                 &tp->currentPos.tran);
-        pmCartCartAdd(tp->currentPos.tran, secondary_displacement.tran,
+        pmCartCartAdd(tp->currentPos.tran, secondary_displacement.tran, 
                 &tp->currentPos.tran);
         tp->currentPos.a += primary_displacement.a + secondary_displacement.a;
         tp->currentPos.b += primary_displacement.b + secondary_displacement.b;
@@ -1147,7 +1574,7 @@ int tpRunCycle(TP_STRUCT * tp, long period)
         tp->motionType = tc->canon_motion_type;
 	emcmotStatus->distance_to_go = tc->target - tc->progress;
         tp->currentPos = primary_after;
-        emcmotStatus->current_vel = tc->currentvel;
+        emcmotStatus->current_vel = tc->cur_vel;
         emcmotStatus->requested_vel = tc->reqvel;
 	emcmotStatus->enables_queued = tc->enables;
 	// report our line number to the guis
@@ -1272,9 +1699,9 @@ int tpSetDout(TP_STRUCT *tp, int index, unsigned char start, unsigned char end) 
     syncdio.dio_mask |= (1 << index);
     if (start > 0)
 	syncdio.dios[index] = 1; // the end value can't be set from canon currently, and has the same value as start
-    else
+    else 
 	syncdio.dios[index] = -1;
-    return 0;
+    return 0;    
 }
 
 // vim:sw=4:sts=4:et:

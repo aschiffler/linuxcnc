@@ -882,10 +882,10 @@ int hal_signal_new(const char *name, hal_type_t type)
 	data_addr = shmalloc_up(sizeof(hal_bit_t));
 	break;
     case HAL_S32:
-	data_addr = shmalloc_up(sizeof(hal_u32_t));
+	data_addr = shmalloc_up(sizeof(hal_s32_t));
 	break;
     case HAL_U32:
-	data_addr = shmalloc_up(sizeof(hal_s32_t));
+	data_addr = shmalloc_up(sizeof(hal_u32_t));
 	break;
     case HAL_FLOAT:
 	data_addr = shmalloc_up(sizeof(hal_float_t));
@@ -1095,6 +1095,11 @@ int hal_link(const char *pin_name, const char *sig_name)
     comp = SHMPTR(pin->owner_ptr);
     data_addr = comp->shmem_base + sig->data_ptr;
     *data_ptr_addr = data_addr;
+    if (( sig->readers == 0 ) && ( sig->writers == 0 ) && ( sig->bidirs == 0 )) {
+	/* this is the first pin for this signal, copy value from pin's "dummy" field */
+	data_addr = hal_shmem_base + sig->data_ptr;
+	*((hal_data_u *)data_addr) = pin->dummysig;
+    }
     /* update the signal's reader/writer/bidir counts */
     if ((pin->dir & HAL_IN) != 0) {
 	sig->readers++;
@@ -3113,6 +3118,7 @@ static void unlink_pin(hal_pin_t * pin)
     hal_sig_t *sig;
     hal_comp_t *comp;
     void *dummy_addr, **data_ptr_addr;
+    hal_data_u *sig_data_addr;
 
     /* is this pin linked to a signal? */
     if (pin->signal != 0) {
@@ -3123,6 +3129,12 @@ static void unlink_pin(hal_pin_t * pin)
 	comp = SHMPTR(pin->owner_ptr);
 	dummy_addr = comp->shmem_base + SHMOFF(&(pin->dummysig));
 	*data_ptr_addr = dummy_addr;
+
+	/* copy current signal value to dummy */
+	sig_data_addr = (hal_data_u *)(hal_shmem_base + sig->data_ptr);
+	dummy_addr = hal_shmem_base + SHMOFF(&(pin->dummysig));
+	*(hal_data_u *)dummy_addr = *sig_data_addr;
+
 	/* update the signal's reader/writer counts */
 	if ((pin->dir & HAL_IN) != 0) {
 	    sig->readers--;

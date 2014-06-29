@@ -12,6 +12,7 @@
 #define RS485MODUL_ID_8INPUT 0x1
 #define RS485MODUL_ID_8OUTPUT 0x2
 #define RS485MODUL_ID_DACADC 0x3
+#define RS485MODUL_ID_TEACHPAD 0x04
 
 #define IDmask_card 	0xF0000000
 #define cardVersion1 	0x10000000
@@ -21,6 +22,7 @@
 #define rs485Version1 	0x00001000
 #define IDmask_dac 	0x00000F00
 #define dacVersion1 	0x00000100
+#define dacVersion2 	0x00000200
 #define IDmask_stepgen 	0x000000F0
 #define stepgenVersion1 0x00000010
 #define IDmask_encoder 	0x0000000F
@@ -45,9 +47,10 @@ typedef struct {
 	hal_u32_t			ENC_control_reg;	//addr 2	0010 000
 	hal_u32_t			CAN_status_reg;
 	hal_u32_t			CAN_control_reg;
-	hal_u32_t			DAC_0; //DAC AXIS 3-0
-	hal_u32_t			DAC_1; //DAC AXIS 5-4
-	hal_u32_t			reserved_1[3];
+	hal_u32_t			DAC_0; //DAC AXIS 1-0
+	hal_u32_t			DAC_1; //DAC AXIS 3-2
+	hal_u32_t			DAC_2; //DAC AXIS 5-4
+	hal_u32_t			reserved_1[2];
 	
 	hal_u32_t			CAN_RX_buffer[4];	//addr 3     	0011 000
 	hal_u32_t			CAN_TX_buffer[4];	

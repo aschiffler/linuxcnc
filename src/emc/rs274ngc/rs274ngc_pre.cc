@@ -109,7 +109,8 @@ int trace;
 static char savedError[LINELEN+1];
 
 Interp::Interp()
-    : log_file(stderr)  
+    : log_file(stderr),
+      _setup(setup_struct())
 {
     _setup.init_once = 1;  
     init_named_parameters();  // need this before Python init.
@@ -155,7 +156,8 @@ Interp::Interp()
 Interp::~Interp() {
 
     if(log_file) {
-	fclose(log_file);
+        if(log_file != stderr)
+            fclose(log_file);
 	log_file = 0;
     }
 }
@@ -876,7 +878,11 @@ int Interp::init()
           if(NULL != (inistring = inifile.Find("PROGRAM_PREFIX", "DISPLAY")))
           {
 	    // found it
-            if (realpath(inistring, _setup.program_prefix) == NULL){
+            char expandinistring[LINELEN];
+            if (inifile.TildeExpansion(inistring,expandinistring,sizeof(expandinistring))) {
+                   logDebug("TildeExpansion failed for: %s",inistring);
+            }
+            if (realpath(expandinistring, _setup.program_prefix) == NULL){
         	//realpath didn't find the file
 		logDebug("realpath failed to find program_prefix:%s:", inistring);
             }

@@ -153,7 +153,7 @@ const int Interp::_ems[] = {
    4, -1, -1, -1, -1, -1, -1, -1, -1, -1,  // 39
   -1, -1, -1, -1, -1, -1, -1, -1,  9,  9,  // 49
    9,  9,  9,  9, -1, -1, -1, -1, -1, -1,  // 59
-   4,  6,  5,  5,  5,  5,  5,  5,  5,  6,  // 69
+   4,  6,  5,  5,  5,  5,  5,  5,  5, -1,  // 69
    7,  7,  7, 7, -1, -1, -1, -1, -1, -1,  // 79
   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  // 89
   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  // 99
@@ -309,9 +309,7 @@ const read_function_pointer Interp::default_readers[256] = {
 /****************************************************************************/
 
 /* There are four global variables*. The first three are _gees, _ems,
-and _readers. The last one, declared here, is for interpreter settings */
-
-setup Interp::_setup;
+and _readers. */
 
 /* The notion of "global variables" is a misnomer - These last four should only
    be accessable by the interpreter and not exported to the rest of emc */

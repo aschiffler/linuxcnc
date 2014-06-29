@@ -111,6 +111,7 @@ EmcPose tcGetPosReal(TC_STRUCT * tc, int of_endpoint)
         abc.tran = tc->coords.rigidtap.abc;
         uvw.tran = tc->coords.rigidtap.uvw;
     } else if (tc->motion_type == TC_LINEAR) {
+
         if (tc->coords.line.xyz.tmag > 0.) {
             // progress is along xyz, so uvw and abc move proportionally in order
             // to end at the same time.

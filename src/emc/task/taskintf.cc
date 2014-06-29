@@ -29,6 +29,9 @@
 #include "inifile.hh"
 #include "iniaxis.hh"
 #include "initraj.hh"
+#include "inihal.hh"
+
+value_inihal_data old_inihal_data;
 
 /* define this to catch isnan errors, for rtlinux FPU register 
    problem testing */
@@ -306,6 +309,39 @@ int emcAxisSetMaxAcceleration(int axis, double acc)
     emcmotCommand.axis = axis;
     emcmotCommand.acc = acc;
     return usrmotWriteEmcmotCommand(&emcmotCommand);
+}
+
+int emcAxisSetMaxJerk(int axis, double jerk)
+{
+
+    if (axis < 0 || axis >= EMCMOT_MAX_AXIS) {
+        return 0;
+    }
+    if (jerk < 0.0) {
+        jerk = 0.0;
+    }
+
+    axis_max_jerk[axis] = jerk;
+    //FIXME-AJ: need to see if we want to send these to motion
+    // disabled for now
+    //FIXME-eric: since AJ decide not to config motion for now , I will also disable jerk config for now
+#if 0
+    //TODO-eric: modify if we want to do jerk setting
+    emcmotCommand.command = EMCMOT_SET_JOINT_ACC_LIMIT;
+    emcmotCommand.joint = joint;
+    emcmotCommand.acc = acc;
+    return usrmotWriteEmcmotCommand(&emcmotCommand);
+#endif
+
+    return 0;
+}
+
+double emcAxisGetMaxJerk(int axis) {
+    if (axis < 0 || axis >= EMCMOT_MAX_AXIS) {
+        return 0;
+    }
+
+    return axis_max_jerk[axis];
 }
 
 /* This function checks to see if any axis or the traj has
@@ -973,7 +1009,7 @@ int emcTrajSetTermCond(int cond, double tolerance)
     return usrmotWriteEmcmotCommand(&emcmotCommand);
 }
 
-int emcTrajLinearMove(EmcPose end, int type, double vel, double ini_maxvel, double acc,
+int emcTrajLinearMove(EmcPose end, int type, double vel, double ini_maxvel, double acc, double jerk,
                       int indexrotary)
 {
 #ifdef ISNAN_TRAP
@@ -994,13 +1030,14 @@ int emcTrajLinearMove(EmcPose end, int type, double vel, double ini_maxvel, doub
     emcmotCommand.vel = vel;
     emcmotCommand.ini_maxvel = ini_maxvel;
     emcmotCommand.acc = acc;
+    emcmotCommand.jerk = jerk;
     emcmotCommand.turn = indexrotary;
 
     return usrmotWriteEmcmotCommand(&emcmotCommand);
 }
 
 int emcTrajCircularMove(EmcPose end, PM_CARTESIAN center,
-			PM_CARTESIAN normal, int turn, int type, double vel, double ini_maxvel, double acc)
+			PM_CARTESIAN normal, int turn, int type, double vel, double ini_maxvel, double acc, double jerk)
 {
 #ifdef ISNAN_TRAP
     if (isnan(end.tran.x) || isnan(end.tran.y) || isnan(end.tran.z) ||
@@ -1032,6 +1069,7 @@ int emcTrajCircularMove(EmcPose end, PM_CARTESIAN center,
     emcmotCommand.vel = vel;
     emcmotCommand.ini_maxvel = ini_maxvel;
     emcmotCommand.acc = acc;
+    emcmotCommand.jerk = jerk;
 
     return usrmotWriteEmcmotCommand(&emcmotCommand);
 }
@@ -1043,7 +1081,7 @@ int emcTrajClearProbeTrippedFlag()
     return usrmotWriteEmcmotCommand(&emcmotCommand);
 }
 
-int emcTrajProbe(EmcPose pos, int type, double vel, double ini_maxvel, double acc, unsigned char probe_type)
+int emcTrajProbe(EmcPose pos, int type, double vel, double ini_maxvel, double acc, double jerk, unsigned char probe_type)
 {
 #ifdef ISNAN_TRAP
     if (isnan(pos.tran.x) || isnan(pos.tran.y) || isnan(pos.tran.z) ||
@@ -1061,12 +1099,13 @@ int emcTrajProbe(EmcPose pos, int type, double vel, double ini_maxvel, double ac
     emcmotCommand.vel = vel;
     emcmotCommand.ini_maxvel = ini_maxvel;
     emcmotCommand.acc = acc;
+    emcmotCommand.jerk = jerk;
     emcmotCommand.probe_type = probe_type;
 
     return usrmotWriteEmcmotCommand(&emcmotCommand);
 }
 
-int emcTrajRigidTap(EmcPose pos, double vel, double ini_maxvel, double acc)
+int emcTrajRigidTap(EmcPose pos, double vel, double ini_maxvel, double acc, double jerk)
 {
 #ifdef ISNAN_TRAP
     if (isnan(pos.tran.x) || isnan(pos.tran.y) || isnan(pos.tran.z)) {
@@ -1081,6 +1120,7 @@ int emcTrajRigidTap(EmcPose pos, double vel, double ini_maxvel, double acc)
     emcmotCommand.vel = vel;
     emcmotCommand.ini_maxvel = ini_maxvel;
     emcmotCommand.acc = acc;
+    emcmotCommand.jerk = jerk;
 
     return usrmotWriteEmcmotCommand(&emcmotCommand);
 }
@@ -1263,10 +1303,19 @@ int emcMotionInit()
 	}
     }
 
+
     r3 = emcPositionLoad();
 
     if (r1 == 0 && r2 == 0 && r3 == 0) {
 	emcmotion_initialized = 1;
+    }
+
+    if (ini_hal_init()) {
+	rcs_print("emcMotionInit: ini_hal_init fail\n");
+    }
+
+    if (ini_hal_init_pins()) {
+	rcs_print("emcMotionInit: ini_hal_init_pins fail\n");
     }
 
     return (r1 == 0 && r2 == 0 && r3 == 0) ? 0 : -1;

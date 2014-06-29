@@ -648,7 +648,6 @@ class LivePlotter:
         self.last_limit = None
         self.last_motion_mode = None
         self.last_joint_position = None
-        self.set_manual_mode = False
         self.notifications_clear = False
         self.notifications_clear_info = False
         self.notifications_clear_error = False
@@ -661,6 +660,7 @@ class LivePlotter:
             self.stat = linuxcnc.stat()
         except linuxcnc.error:
             return False
+        self.current_task_mode = self.stat.task_mode
         def C(s):
             a = o.colors[s + "_alpha"]
             s = o.colors[s]
@@ -715,6 +715,16 @@ class LivePlotter:
             print "error", detail
             del self.stat
             return
+        if (self.stat.task_mode != self.current_task_mode):
+            self.current_task_mode = self.stat.task_mode
+            if (self.current_task_mode == linuxcnc.MODE_MANUAL):
+                root_window.tk.eval(pane_top + ".tabs raise manual")
+            if (self.current_task_mode == linuxcnc.MODE_MDI):
+                root_window.tk.eval(pane_top + ".tabs raise mdi")
+            if (self.current_task_mode == linuxcnc.MODE_AUTO):
+                # not sure if anything needs to be done for this
+                pass
+
         self.after = self.win.after(update_ms, self.update)
 
         self.win.set_current_line(self.stat.id or self.stat.motion_line)
@@ -756,11 +766,6 @@ class LivePlotter:
         vupdate(vars.interp_state, self.stat.interp_state)
         vupdate(vars.queued_mdi_commands, self.stat.queued_mdi_commands)
         if hal_present == 1 :
-            set_manual_mode = comp["set-manual-mode"]
-            if self.set_manual_mode != set_manual_mode:
-                 self.set_manual_mode = set_manual_mode
-                 if self.set_manual_mode:
-                     root_window.tk.eval(pane_top + ".tabs raise manual")
             notifications_clear = comp["notifications-clear"]
             if self.notifications_clear != notifications_clear:
                  self.notifications_clear = notifications_clear
@@ -1123,6 +1128,8 @@ def open_file_guts(f, filtered=False, addrecent=True):
         o.lp.set_depth(from_internal_linear_unit(o.get_foam_z()),
                        from_internal_linear_unit(o.get_foam_w()))
 
+    except Exception, e:
+        notifications.add("error", str(e))
     finally:
         # Before unbusying, I update again, so that any keystroke events
         # that reached the program while it was busy are sent to the
@@ -1928,6 +1935,31 @@ class TclCommands(nf.TclCommands):
         if loaded_file is None:
             pass
         else:
+            omode = 0
+            showname = os.path.basename(loaded_file)
+            if not os.access(loaded_file,os.W_OK):
+                omode = root_window.tk.call(
+                      "nf_dialog",
+                      ".filenotwritable",
+                      _("File not Writable:") + showname,
+                      _("This file is not writable\n"
+                      "You can Edit-readonly\n\n"
+                      "or\n\n"
+                      "Save it to your own directory\n"
+                      "then open that saved, writable file"),
+                      "warning",
+                      0,
+                      _("Edit-readonly"),
+                      _("Save"),
+                      _("Cancel")
+                      )
+
+            if omode == 1:
+                root_window.tk.call("save_gcode",
+                                   "my_" + showname)
+                return
+            elif omode == 2: return
+
             e = string.split(editor)
             e.append(loaded_file)
             e.append("&")
@@ -2447,9 +2479,14 @@ class TclCommands(nf.TclCommands):
 
     def save_gcode(*args):
         if not loaded_file: return
+        initialfile = ''
+        if len(args):
+           initialfile = args[0]
         global open_directory
         f = root_window.tk.call("tk_getSaveFile", "-initialdir", open_directory,
-            "-filetypes", ((_("rs274ngc files"), ".ngc"),))
+            "-initialfile", initialfile,
+            "-filetypes",
+             ((_("rs274ngc files"), ".ngc"),))
         if not f: return
         f = unicode(f)
         open_directory = os.path.dirname(f)
@@ -2458,7 +2495,7 @@ class TclCommands(nf.TclCommands):
         else:
             srcfile = loaded_file
         try:
-            shutil.copy(srcfile, f)
+            shutil.copyfile(srcfile, f)
         except (shutil.Error, os.error, IOError), detail:
             tb = traceback.format_exc()
             root_window.tk.call("nf_dialog", ".error", _("Error saving file"),
@@ -3091,7 +3128,6 @@ if hal_present == 1 :
     comp.newpin("jog.v", hal.HAL_BIT, hal.HAL_OUT)
     comp.newpin("jog.w", hal.HAL_BIT, hal.HAL_OUT)
     comp.newpin("jog.increment", hal.HAL_FLOAT, hal.HAL_OUT)
-    comp.newpin("set-manual-mode",hal.HAL_BIT,hal.HAL_IN)
     comp.newpin("notifications-clear",hal.HAL_BIT,hal.HAL_IN)
     comp.newpin("notifications-clear-info",hal.HAL_BIT,hal.HAL_IN)
     comp.newpin("notifications-clear-error",hal.HAL_BIT,hal.HAL_IN)
@@ -3250,11 +3286,11 @@ for app in tkapps:
 
 o.update_idletasks()
 
-import _tk_seticon
-from rs274.icon import icon
-_tk_seticon.seticon(root_window, icon)
-_tk_seticon.seticon(widgets.about_window, icon)
-_tk_seticon.seticon(widgets.help_window, icon)
+
+icons = (root_window.tk.call("load_image", "axis-48x48"),
+         root_window.tk.call("load_image", "axis-24x24"))
+for win in root_window, widgets.about_window, widgets.help_window:
+    root_window.tk.call("wm", "iconphoto", win, *icons)
 
 vars.kinematics_type.set(s.kinematics_type)
 vars.max_queued_mdi_commands.set(int(inifile.find("TASK", "MDI_QUEUED_COMMANDS") or  10))
@@ -3306,18 +3342,25 @@ def forget(widget, *pins):
         widget.tk.call(m, "forget", widget._w)
 
 forget(widgets.brake, "motion.spindle-brake")
-forget(widgets.spindle_cw, "motion.spindle-forward", "motion.spindle-on")
-forget(widgets.spindle_ccw, "motion.spindle-reverse")
-forget(widgets.spindle_stop, "motion.spindle-forward", "motion.spindle-reverse", "motion.spindle-on")
-forget(widgets.spindle_plus, "motion.spindle-speed-out")
-forget(widgets.spindle_minus, "motion.spindle-speed-out")
-forget(widgets.spindlef,  "motion.spindle-forward", "motion.spindle-reverse",
-    "motion.spindle-on", "motion.spindle-speed-out",
-    "motion.spindle-brake")
-forget(widgets.spindlel,  "motion.spindle-forward", "motion.spindle-reverse",
-    "motion.spindle-on", "motion.spindle-speed-out",
-    "motion.spindle-brake")
-forget(widgets.spinoverridef, "motion.spindle-speed-out")
+forget(widgets.spindle_cw, "motion.spindle-forward", "motion.spindle-on",
+       "motion.spindle-speed-out", "motion.spindle-speed-out-abs", "motion.spindle-speed-out-rps", "motion.spindle-speed-out-rps-abs")
+forget(widgets.spindle_ccw, "motion.spindle-reverse",
+       "motion.spindle-speed-out", "motion.spindle-speed-out-abs", "motion.spindle-speed-out-rps", "motion.spindle-speed-out-rps-abs")
+forget(widgets.spindle_stop, "motion.spindle-forward", "motion.spindle-reverse", "motion.spindle-on",
+       "motion.spindle-speed-out", "motion.spindle-speed-out-abs", "motion.spindle-speed-out-rps", "motion.spindle-speed-out-rps-abs")
+
+forget(widgets.spindle_plus,
+       "motion.spindle-speed-out", "motion.spindle-speed-out-abs", "motion.spindle-speed-out-rps", "motion.spindle-speed-out-rps-abs")
+forget(widgets.spindle_minus,
+       "motion.spindle-speed-out", "motion.spindle-speed-out-abs", "motion.spindle-speed-out-rps", "motion.spindle-speed-out-rps-abs")
+
+forget(widgets.spindlef,  "motion.spindle-forward", "motion.spindle-reverse", "motion.spindle-on", "motion.spindle-brake",
+       "motion.spindle-speed-out", "motion.spindle-speed-out-abs", "motion.spindle-speed-out-rps", "motion.spindle-speed-out-rps-abs")
+forget(widgets.spindlel,  "motion.spindle-forward", "motion.spindle-reverse", "motion.spindle-on", "motion.spindle-brake",
+       "motion.spindle-speed-out", "motion.spindle-speed-out-abs", "motion.spindle-speed-out-rps", "motion.spindle-speed-out-rps-abs")
+
+forget(widgets.spinoverridef,
+       "motion.spindle-speed-out", "motion.spindle-speed-out-abs", "motion.spindle-speed-out-rps", "motion.spindle-speed-out-rps-abs")
 
 has_limit_switch = 0
 for j in range(9):
@@ -3334,9 +3377,9 @@ if not has_limit_switch:
     widgets.override.grid_forget()
 
 
-#forget(widgets.mist, "iocontrol.0.coolant-mist")
-#forget(widgets.flood, "iocontrol.0.coolant-flood")
-#forget(widgets.lubel, "iocontrol.0.coolant-flood", "iocontrol.0.coolant-mist")
+forget(widgets.mist, "iocontrol.0.coolant-mist")
+forget(widgets.flood, "iocontrol.0.coolant-flood")
+forget(widgets.lubel, "iocontrol.0.coolant-flood", "iocontrol.0.coolant-mist")
 
 rcfile = "~/.axisrc"
 user_command_file = inifile.find("DISPLAY", "USER_COMMAND_FILE") or ""

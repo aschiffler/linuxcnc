@@ -21,6 +21,7 @@
 _DEBUGSTRING = ["NONE"]
 import sys
 import os
+
 # this is for importing modules from lib/python/pncconf
 BASE = os.path.abspath(os.path.join(os.path.dirname(sys.argv[0]), ".."))
 libdir = os.path.join(BASE, "lib", "python","pncconf")
@@ -193,178 +194,83 @@ _IMPERIAL = 0;_METRIC = 1
 # has watchdog, max GPIOI, 
 # low frequency rate , hi frequency rate, 
 # available connector numbers,  then list of component type and logical number
-mesafirmwaredata = [
+mesafirmwaredata_internal = [
+    ['5i25-Internal Data', '5i25', '7i76x2 -With One 7i76', '5i25', 'hm2_pci', 1,3, 0,0, 0,3, 0,0, 5,2, 1,2, 0,0,0,0,0,0,0,0, 1, 34, 33, 200, [3, 2],
+        # TAB 3
+        [STEPA,0],[STEPB,0],[STEPA,1],[STEPB,1],[STEPA,2],[STEPB,2],[STEPA,3],[STEPB,3],[STEPA,4],[STEPB,4],
+        [SS7I76M0,0],[RXDATA0,0],[TXDATA1,0],[RXDATA1,0],[ENCI,0],[ENCB,0],[ENCA,0],
+        [NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],
+        # TAB 2
+        [GPIOI, 0],[GPIOI, 0],[GPIOI, 0],[GPIOI, 0],[GPIOI, 0],[GPIOI, 0],[GPIOI, 0],[GPIOI, 0],[GPIOI, 0],[GPIOI, 0],
+        [GPIOI, 0],[GPIOI, 0],[GPIOI, 0],[GPIOI, 0],[GPIOI, 0],[GPIOI, 0],[GPIOI, 0],
+        [NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],],
+
+    ["5i25-Internal Data", "5i25", "7i76x2", "5i24", "hm2_pci", 2,3, 0,0, 0,3, 0,0, 10,2, 1,4, 0,0,0,0,0,0,0,0, 1, 34 , 33, 200, [3,2],
+        # TAB 3
+        [STEPA,0],[STEPB,0],[STEPA,1],[STEPB,1],[STEPA,2],[STEPB,2],[STEPA,3],[STEPB,3],[STEPA,4],[STEPB,4],
+        [SS7I76M0,0],[RXDATA0,0],[TXDATA1,0],[RXDATA1,0],[ENCI,0],[ENCB,0],[ENCA,0],
+        [NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],
+        # TAB 2
+        [STEPA,5],[STEPB,5],[STEPA,6],[STEPB,6],[STEPA,7],[STEPB,7],[STEPA,8],[STEPB,8],[STEPA,9],[STEPB,9],
+        [SS7I76M2,0],[RXDATA2,0],[TXDATA3,0],[RXDATA3,0],[ENCI,1],[ENCB,1],[ENCA,1],
+        [NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],],
+
+    ['5i25-Internal Data', '5i25', '7i77_7i76', '5i25', 'hm2_pci', 6,3, 0,0, 0,3, 0,0, 5,2, 1,5, 0,0,0,0,0,0,0,0, 1, 34, 33, 200, [3, 2],
+        # Tab 3
+        [TXEN2, 0],[TXDATA2, 0],[RXDATA2, 0],[SS7I77M1, 0],[RXDATA1, 0],[SS7I77M0, 0],[RXDATA0, 0],[MXES, 0],[MXE0, 0],[MXE1, 0],
+        [MXEI, 0],[MXE0, 1],[MXE1, 1],[MXEI, 1],[MXE0, 2],[MXE1, 2],[MXEI, 2],
+        [NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],
+        # TAB 2
+        [STEPA,0],[STEPB,0],[STEPA,1],[STEPB,1],[STEPA,2],[STEPB,2],[STEPA,3],[STEPB,3],[STEPA,4],[STEPB,4],
+        [SS7I76M3,0],[RXDATA3,0],[TXDATA4,0],[RXDATA4,0],[ENCI,0],[ENCB,0],[ENCA,0],
+        [NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],],
+
+    ['5i25-Internal Data', '5i25', '7i77x2 With One 7i77', '5i25', 'hm2_pci', 6,3, 0,0, 0,3, 0,0, 0,2, 1,3, 0,0,0,0,0,0,0,0, 1, 34, 33, 200, [3, 2],
+        # TAB 3
+        [TXEN2, 0],[TXDATA2, 0],[RXDATA2, 0],[SS7I77M1, 0],[RXDATA1, 0],[SS7I77M0, 0],[RXDATA0, 0],[MXES, 0],[MXE0, 0],[MXE1, 0],
+        [MXEI, 0],[MXE0, 1],[MXE1, 1],[MXEI, 1],[MXE0, 2],[MXE1, 2],[MXEI, 2],
+        [NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],
+        # TAB 2
+        [GPIOI, 0],[GPIOI, 0],[GPIOI, 0],[GPIOI, 0],[GPIOI, 0],[GPIOI, 0],[GPIOI, 0],[GPIOI, 0],[GPIOI, 0],[GPIOI, 0],[GPIOI, 0],
+        [GPIOI, 0],[GPIOI, 0],[GPIOI, 0],[GPIOI, 0],[GPIOI, 0],[GPIOI, 0],
+        [NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],],
+
+    ['5i25-Internal Data', '5i25', '7i77x2', '5i25', 'hm2_pci', 12,3, 0,0, 0,3, 0,0, 0,2, 1,6, 0,0,0,0,0,0,0,0, 1, 34, 33, 200, [3, 2], 
+        # TAB 3
+        [TXEN2, 0],[TXDATA2, 0],[RXDATA2, 0],[SS7I77M1, 0],[RXDATA1, 0],[SS7I77M0, 0],[RXDATA0, 0],[MXES, 0],[MXE0, 0],[MXE1, 0],
+        [MXEI, 0],[MXE0, 1],[MXE1, 1],[MXEI, 1],[MXE0, 2],[MXE1, 2],[MXEI, 2],
+        [NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],
+        # TAB 2
+        [TXEN5, 0],[TXDATA5, 0],[RXDATA5, 0],[SS7I77M4, 0],[RXDATA4, 0],[SS7I77M3, 0],[RXDATA3, 0],[MXES, 3],[MXE0, 3],[MXE1, 3],
+        [MXEI, 3],[MXE0, 4],[MXE1, 4],[MXEI, 4],[MXE0, 5],[MXE1, 5],[MXEI, 5],
+        [NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],],
+
+    ['5i25-Internal Data', '5i25', 'prob_rfx2', '5i25', 'hm2_pci', 2,3, 0,0, 2,3, 0,0, 8,2, 0,0, 0,0,0,0,0,0,0,0, 1, 34, 33, 200,[3, 2],
+        # TAB 3
+        [GPIOI, 0],[PWMP, 0],[STEPA, 0],[GPIOI, 0],[STEPB, 0],[PWMD, 0],[STEPA, 1],[GPIOI, 0],[STEPB, 1],[STEPA, 2],
+        [STEPB, 2],[STEPA, 3],[STEPB, 3],[GPIOI, 0],[ENCA, 0],[ENCB, 0],[ENCI, 0],
+        [NUSED, 0],[NUSED, 0],[NUSED, 0],[NUSED, 0],[NUSED, 0],[NUSED, 0],[NUSED, 0],
+        # TAB 2
+        [GPIOI, 0],[PWMP, 1],[STEPA, 4],[GPIOI, 0],[STEPB, 4],[PWMD, 1],[STEPA, 5],[GPIOI, 0],[STEPB, 5],
+        [STEPA, 6],[STEPB, 6],[STEPA, 7],[STEPB, 7],[GPIOI, 0],[ENCA, 1],[ENCB, 1],[ENCI, 1],
+        [NUSED, 0],[NUSED, 0],[NUSED, 0],[NUSED, 0],[NUSED, 0],[NUSED, 0],[NUSED, 0],],
+
     ["5i20", "5i20", "SV12", "5i20", "hm2_pci", 12,3, 0,0, 12,3, 0,0, 0,0, 0,0, 0,0,0,0,0,0,0,0, 1, 72 , 33, 100, [2,3,4],
         [ENCB,1],[ENCA,1],[ENCB,0],[ENCA,0],[ENCI,1],[ENCI,0],[PWMP,1],[PWMP,0],[PWMD,1],[PWMD,0],[PWME,1],[PWME,0],
-                 [ENCB,3],[ENCA,3],[ENCB,2],[ENCA,2],[ENCI,3],[ENCI,2],[PWMP,3],[PWMP,2],[PWMD,3],[PWMD,2],[PWME,3],[PWME,2],
+        [ENCB,3],[ENCA,3],[ENCB,2],[ENCA,2],[ENCI,3],[ENCI,2],[PWMP,3],[PWMP,2],[PWMD,3],[PWMD,2],[PWME,3],[PWME,2],
         [ENCB,5],[ENCA,5],[ENCB,4],[ENCA,4],[ENCI,5],[ENCI,4],[PWMP,5],[PWMP,4],[PWMD,5],[PWMD,4],[PWME,5],[PWME,4],
-                 [ENCB,7],[ENCA,7],[ENCB,6],[ENCA,6],[ENCI,7],[ENCI,6],[PWMP,7],[PWMP,6],[PWMD,7],[PWMD,6],[PWME,7],[PWME,6],
+        [ENCB,7],[ENCA,7],[ENCB,6],[ENCA,6],[ENCI,7],[ENCI,6],[PWMP,7],[PWMP,6],[PWMD,7],[PWMD,6],[PWME,7],[PWME,6],
         [ENCB,9],[ENCA,9],[ENCB,8],[ENCA,8],[ENCI,9],[ENCI,8],[PWMP,9],[PWMP,8],[PWMD,9],[PWMD,8],[PWME,9],[PWME,8],
-                 [ENCB,11],[ENCA,11],[ENCB,10],[ENCA,10],[ENCI,11],[ENCI,10],[PWMP,11],[PWMP,10],[PWMD,11],[PWMD,10],[PWME,11],[PWME,10] ],
+        [ENCB,11],[ENCA,11],[ENCB,10],[ENCA,10],[ENCI,11],[ENCI,10],[PWMP,11],[PWMP,10],[PWMD,11],[PWMD,10],[PWME,11],[PWME,10]
+    ],
     ["5i20", "5i20", "SVST8_4", "5i20", "hm2_pci", 8,3, 0,0, 8,3, 0,0, 4,2, 0,0, 0,0,0,0,0,0,0,0, 1, 72, 33, 100, [2,3,4],
-        [ENCB,1],[ENCA,1],[ENCB,0],[ENCA,0],[ENCI,1],[ENCI,0],[PWMP,1],[PWMP,0],[PWMD,1],[PWMD,0],[PWME,1],[PWME,0],
-                 [ENCB,3],[ENCA,3],[ENCB,2],[ENCA,2],[ENCI,3],[ENCI,2],[PWMP,3],[PWMP,2],[PWMD,3],[PWMD,2],[PWME,3],[PWME,2],
-        [ENCB,5],[ENCA,5],[ENCB,4],[ENCA,4],[ENCI,5],[ENCI,4],[PWMP,5],[PWMP,4],[PWMD,5],[PWMD,4],[PWME,5],[PWME,4],
-                 [ENCB,7],[ENCA,7],[ENCB,6],[ENCA,6],[ENCI,7],[ENCI,6],[PWMP,7],[PWMP,6],[PWMD,7],[PWMD,6],[PWME,7],[PWME,6],
-        [STEPA,0],[STEPB,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[STEPA,1],[STEPB,1],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],
-                  [STEPA,2],[STEPB,2],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[STEPA,3],[STEPB,3],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0] ],
-    ["5i20", "5i20", "SVST2_4_7I47", "5i20", "hm2_pci", 4,3, 0,0, 2,2, 0,0, 4,2, 0,0, 0,0,0,0,0,0,0,0, 1, 72, 33, 100, [2,3,4],
-        [STEPA,0],[STEPB,0],[STEPA,1],[STEPB,1],[ENCA,0],[ENCA,2],[ENCB,0],[ENCB,2],[ENCI,0],[ENCI,2],[ENCA,1],[ENCA,3],
-                [ENCB,1],[ENCB,3],[ENCI,1],[ENCI,3],[STEPA,2],[STEPB,2],[STEPA,3],[STEPB,3],[PWMP,0],[PWMD,0],[PWMP,1],[PWMD,1],
-        [GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],
-                [GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],
-        [GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],
-                [GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0], ],
-    ["5i20", "5i20", "SVST2_8", "5i20", "hm2_pci", 2,3, 0,0, 2,3, 0,0, 8,6, 0,0, 0,0,0,0,0,0,0,0, 1, 72, 33, 100, [2,3,4],
-        [ENCB,1],[ENCA,1],[ENCB,0],[ENCA,0],[ENCI,1],[ENCI,0],[PWMP,1],[PWMP,0],[PWMD,1],[PWMD,0],[PWME,1],[PWME,0],
-                 [GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],
-        [STEPA,0],[STEPB,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[STEPA,1],[STEPB,1],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],
-                  [STEPA,2],[STEPB,2],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[STEPA,3],[STEPB,3],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],
-        [STEPA,4],[STEPB,4],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[STEPA,5],[STEPB,5],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],
-                  [STEPA,6],[STEPB,6],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[STEPA,7],[STEPB,7],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0] ],
-    ["5i20", "5i20", "SVST8_4IM2", "5i20", "hm2_pci", 8,4, 0,0, 8,4, 0,0, 4,2, 0,0, 1, 72, 33, 100, [2,3,4],
-        [ENCB,1],[ENCA,1],[ENCB,0],[ENCA,0],[ENCI,1],[ENCI,0],[PWMP,1],[PWMP,0],[PWMD,1],[PWMD,0],[PWME,1],[PWME,0],
-                 [ENCB,3],[ENCA,3],[ENCB,2],[ENCA,2],[ENCI,3],[ENCI,2],[PWMP,3],[PWMP,2],[PWMD,3],[PWMD,2],[PWME,3],[PWME,2],
-        [ENCB,5],[ENCA,5],[ENCB,4],[ENCA,4],[ENCI,5],[ENCI,4],[PWMP,5],[PWMP,4],[PWMD,5],[PWMD,4],[PWME,5],[PWME,4],
-                 [ENCB,7],[ENCA,7],[ENCB,6],[ENCA,6],[ENCI,7],[ENCI,6],[PWMP,7],[PWMP,6],[PWMD,7],[PWMD,6],[PWME,7],[PWME,6],
-        [ENCM,0],[ENCM,1],[ENCM,2],[ENCM,3],[ENCM,4],[ENCM,5],[ENCM,6],[ENCM,7],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],
-                 [GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[STEPA,0],[STEPB,0],[STEPA,1],[STEPB,1],[STEPA,2],[STEPB,2],[STEPA,3],[STEPB,3] ],
-    ["5i22-1", "5i22", "SV16", "5i22-1", "hm2_pci", 16,3, 0,0, 16,3, 0,0, 0,0, 0,0,0,0,0,0,0,0, 1, 96, 48, 96, [2,3,4,5],
-        [ENCB,1],[ENCA,1],[ENCB,0],[ENCA,0],[ENCI,1],[ENCI,0],[PWMP,1],[PWMP,0],[PWMD,1],[PWMD,0],[PWME,1],[PWME,0],
-                 [ENCB,3],[ENCA,3],[ENCB,2],[ENCA,2],[ENCI,3],[ENCI,2],[PWMP,3],[PWMP,2],[PWMD,3],[PWMD,2],[PWME,3],[PWME,2],
-        [ENCB,5],[ENCA,5],[ENCB,4],[ENCA,4],[ENCI,5],[ENCI,4],[PWMP,5],[PWMP,4],[PWMD,5],[PWMD,4],[PWME,5],[PWME,4],
-                 [ENCB,7],[ENCA,7],[ENCB,6],[ENCA,6],[ENCI,7],[ENCI,6],[PWMP,7],[PWMP,6],[PWMD,7],[PWMD,6],[PWME,7],[PWME,6],
-        [ENCB,9],[ENCA,9],[ENCB,8],[ENCA,8],[ENCI,9],[ENCI,8],[PWMP,9],[PWMP,8],[PWMD,9],[PWMD,8],[PWME,9],[PWME,8],
-                 [ENCB,11],[ENCA,11],[ENCB,10],[ENCA,10],[ENCI,11],[ENCI,10],[PWMP,11],[PWMP,10],[PWMD,11],[PWMD,10],[PWME,11],[PWME,10],
-        [ENCB,13],[ENCA,13],[ENCB,12],[ENCA,12],[ENCI,13],[ENCI,12],[PWMP,13],[PWMP,12],[PWMD,13],[PWMD,12],[PWME,13],[PWME,12],
-                  [ENCB,15],[ENCA,15],[ENCB,14],[ENCA,14],[ENCI,15],[ENCI,14],[PWMP,15],[PWMP,14],[PWMD,15],[PWMD,14],[PWME,15],[PWME,14] ],
-    ["5i22-1", "5i22", "SVST8_8", "5i22-1", "hm2_pci", 8,3, 0,0, 8,3, 0,0, 8,6, 0,0, 0,0,0,0,0,0,0,0, 1, 96, 48, 96, [2,3,4,5],
-       [ENCB,1],[ENCA,1],[ENCB,0],[ENCA,0],[ENCI,1],[ENCI,0],[PWMP,1],[PWMP,0],[PWMD,1],[PWMD,0],[PWME,1],[PWME,0],
-                [ENCB,3],[ENCA,3],[ENCB,2],[ENCA,2],[ENCI,3],[ENCI,2],[PWMP,3],[PWMP,2],[PWMD,3],[PWMD,2],[PWME,3],[PWME,2],
-       [ENCB,5],[ENCA,5],[ENCB,4],[ENCA,4],[ENCI,5],[ENCI,4],[PWMP,5],[PWMP,4],[PWMD,5],[PWMD,4],[PWME,5],[PWME,4],
-                [ENCB,7],[ENCA,7],[ENCB,6],[ENCA,6],[ENCI,7],[ENCI,6],[PWMP,7],[PWMP,6],[PWMD,7],[PWMD,6],[PWME,7],[PWME,6],
-       [STEPA,0],[STEPB,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[STEPA,1],[STEPB,1],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],
-                [STEPA,2],[STEPB,2],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[STEPA,3],[STEPB,3],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],
-       [STEPA,4],[STEPB,4],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[STEPA,5],[STEPB,5],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],
-                [STEPA,6],[STEPB,6],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[STEPA,7],[STEPB,7],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0] ],
-    ["5i22-1", "5i22", "SVST8_24", "5i22-1", "hm2_pci", 8,3, 0,0, 8,3, 0,0, 24,2, 0,0, 1, 96, 48, 96, [2,3,4,5],
-       [ENCB,1],[ENCA,1],[ENCB,0],[ENCA,0],[ENCI,1],[ENCI,0],[PWMP,1],[PWMP,0],[PWMD,1],[PWMD,0],[PWME,1],[PWME,0],
-                [ENCB,3],[ENCA,3],[ENCB,2],[ENCA,2],[ENCI,3],[ENCI,2],[PWMP,3],[PWMP,2],[PWMD,3],[PWMD,2],[PWME,3],[PWME,2],
-       [ENCB,5],[ENCA,5],[ENCB,4],[ENCA,4],[ENCI,5],[ENCI,4],[PWMP,5],[PWMP,4],[PWMD,5],[PWMD,4],[PWME,5],[PWME,4],
-                [ENCB,7],[ENCA,7],[ENCB,6],[ENCA,6],[ENCI,7],[ENCI,6],[PWMP,7],[PWMP,6],[PWMD,7],[PWMD,6],[PWME,7],[PWME,6],
-       [STEPA,0],[STEPB,0],[STEPA,1],[STEPB,1],[STEPA,2],[STEPB,2],[STEPA,3],[STEPB,3],[STEPA,4],[STEPB,4],[STEPA,5],[STEPB,5],
-                [STEPA,6],[STEPB,6],[STEPA,7],[STEPB,7],[STEPA,8],[STEPB,8],[STEPA,9],[STEPB,9],[STEPA,10],[STEPB,10],[STEPA,11],[STEPB,11],
-       [STEPA,12],[STEPB,12],[STEPA,13],[STEPB,13],[STEPA,14],[STEPB,14],[STEPA,15],[STEPB,15],[STEPA,16],[STEPB,16],[STEPA,17],[STEPB,17],
-                [STEPA,18],[STEPB,18],[STEPA,19],[STEPB,19],[STEPA,20],[STEPB,20],[STEPA,21],[STEPB,21],[STEPA,22],[STEPB,22],[STEPA,23],[STEPB,23] ],
-    ["5i22-1.5", "5i22", "SV16", "5i22-1.5", "hm2_pci", 16,3, 0,0, 16,3, 0,0, 0,0, 0,0, 0,0,0,0,0,0,0,0, 1, 96, 48, 96, [2,3,4,5],
-        [ENCB,1],[ENCA,1],[ENCB,0],[ENCA,0],[ENCI,1],[ENCI,0],[PWMP,1],[PWMP,0],[PWMD,1],[PWMD,0],[PWME,1],[PWME,0],
-                 [ENCB,3],[ENCA,3],[ENCB,2],[ENCA,2],[ENCI,3],[ENCI,2],[PWMP,3],[PWMP,2],[PWMD,3],[PWMD,2],[PWME,3],[PWME,2],
-        [ENCB,5],[ENCA,5],[ENCB,4],[ENCA,4],[ENCI,5],[ENCI,4],[PWMP,5],[PWMP,4],[PWMD,5],[PWMD,4],[PWME,5],[PWME,4],
-                 [ENCB,7],[ENCA,7],[ENCB,6],[ENCA,6],[ENCI,7],[ENCI,6],[PWMP,7],[PWMP,6],[PWMD,7],[PWMD,6],[PWME,7],[PWME,6],
-        [ENCB,9],[ENCA,9],[ENCB,8],[ENCA,8],[ENCI,9],[ENCI,8],[PWMP,9],[PWMP,8],[PWMD,9],[PWMD,8],[PWME,9],[PWME,8],
-                 [ENCB,11],[ENCA,11],[ENCB,10],[ENCA,10],[ENCI,11],[ENCI,10],[PWMP,11],[PWMP,10],[PWMD,11],[PWMD,10],[PWME,11],[PWME,10],
-        [ENCB,13],[ENCA,13],[ENCB,12],[ENCA,12],[ENCI,13],[ENCI,12],[PWMP,13],[PWMP,12],[PWMD,13],[PWMD,12],[PWME,13],[PWME,12],
-                  [ENCB,15],[ENCA,15],[ENCB,14],[ENCA,14],[ENCI,15],[ENCI,14],[PWMP,15],[PWMP,14],[PWMD,15],[PWMD,14],[PWME,15],[PWME,14] ],
-    ["5i22-1.5", "5i22", "SVST8_8", "5i22-1.5", "hm2_pci", 8,3, 0,0, 8,3, 0,0, 8,6, 0,0, 0,0,0,0,0,0,0,0, 1, 96, 48, 96, [2,3,4,5],
-       [ENCB,1],[ENCA,1],[ENCB,0],[ENCA,0],[ENCI,1],[ENCI,0],[PWMP,1],[PWMP,0],[PWMD,1],[PWMD,0],[PWME,1],[PWME,0],
-                [ENCB,3],[ENCA,3],[ENCB,2],[ENCA,2],[ENCI,3],[ENCI,2],[PWMP,3],[PWMP,2],[PWMD,3],[PWMD,2],[PWME,3],[PWME,2],
-       [ENCB,5],[ENCA,5],[ENCB,4],[ENCA,4],[ENCI,5],[ENCI,4],[PWMP,5],[PWMP,4],[PWMD,5],[PWMD,4],[PWME,5],[PWME,4],
-                [ENCB,7],[ENCA,7],[ENCB,6],[ENCA,6],[ENCI,7],[ENCI,6],[PWMP,7],[PWMP,6],[PWMD,7],[PWMD,6],[PWME,7],[PWME,6],
-       [STEPA,0],[STEPB,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[STEPA,1],[STEPB,1],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],
-                [STEPA,2],[STEPB,2],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[STEPA,3],[STEPB,3],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],
-       [STEPA,4],[STEPB,4],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[STEPA,5],[STEPB,5],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],
-                [STEPA,6],[STEPB,6],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[STEPA,7],[STEPB,7],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0] ],
-    ["5i22-1.5", "5i22", "SVS8_24", "5i22-1.5", "hm2_pci", 8,3, 0,0, 8,3, 0,0, 24,2, 0,0, 0,0,0,0,0,0,0,0, 1, 96, 48, 96, [2,3,4,5],
-       [ENCB,1],[ENCA,1],[ENCB,0],[ENCA,0],[ENCI,1],[ENCI,0],[PWMP,1],[PWMP,0],[PWMD,1],[PWMD,0],[PWME,1],[PWME,0],
-                [ENCB,3],[ENCA,3],[ENCB,2],[ENCA,2],[ENCI,3],[ENCI,2],[PWMP,3],[PWMP,2],[PWMD,3],[PWMD,2],[PWME,3],[PWME,2],
-       [ENCB,5],[ENCA,5],[ENCB,4],[ENCA,4],[ENCI,5],[ENCI,4],[PWMP,5],[PWMP,4],[PWMD,5],[PWMD,4],[PWME,5],[PWME,4],
-                [ENCB,7],[ENCA,7],[ENCB,6],[ENCA,6],[ENCI,7],[ENCI,6],[PWMP,7],[PWMP,6],[PWMD,7],[PWMD,6],[PWME,7],[PWME,6],
-       [STEPA,0],[STEPB,0],[STEPA,1],[STEPB,1],[STEPA,2],[STEPB,2],[STEPA,3],[STEPB,3],[STEPA,4],[STEPB,4],[STEPA,5],[STEPB,5],
-                [STEPA,6],[STEPB,6],[STEPA,7],[STEPB,7],[STEPA,8],[STEPB,8],[STEPA,9],[STEPB,9],[STEPA,10],[STEPB,10],[STEPA,11],[STEPB,11],
-       [STEPA,12],[STEPB,12],[STEPA,13],[STEPB,13],[STEPA,14],[STEPB,14],[STEPA,15],[STEPB,15],[STEPA,16],[STEPB,16],[STEPA,17],[STEPB,17],
-                [STEPA,18],[STEPB,18],[STEPA,19],[STEPB,19],[STEPA,20],[STEPB,20],[STEPA,21],[STEPB,21],[STEPA,22],[STEPB,22],[STEPA,23],[STEPB,23] ],
-    ["5i23", "5i23", "SV12", "5i23", "hm2_pci", 12,3, 0,0, 12,3, 0,0, 0,0, 0,0, 0,0,0,0,0,0,0,0, 1, 72 , 48, 96, [2,3,4],
-        [ENCB,1],[ENCA,1],[ENCB,0],[ENCA,0],[ENCI,1],[ENCI,0],[PWMP,1],[PWMP,0],[PWMD,1],[PWMD,0],[PWME,1],[PWME,0],
-                 [ENCB,3],[ENCA,3],[ENCB,2],[ENCA,2],[ENCI,3],[ENCI,2],[PWMP,3],[PWMP,2],[PWMD,3],[PWMD,2],[PWME,3],[PWME,2],
-        [ENCB,5],[ENCA,5],[ENCB,4],[ENCA,4],[ENCI,5],[ENCI,4],[PWMP,5],[PWMP,4],[PWMD,5],[PWMD,4],[PWME,5],[PWME,4],
-                 [ENCB,7],[ENCA,7],[ENCB,6],[ENCA,6],[ENCI,7],[ENCI,6],[PWMP,7],[PWMP,6],[PWMD,7],[PWMD,6],[PWME,7],[PWME,6],
-        [ENCB,9],[ENCA,9],[ENCB,8],[ENCA,8],[ENCI,9],[ENCI,8],[PWMP,9],[PWMP,8],[PWMD,9],[PWMD,8],[PWME,9],[PWME,8],
-                 [ENCB,11],[ENCA,11],[ENCB,10],[ENCA,10],[ENCI,11],[ENCI,10],[PWMP,11],[PWMP,10],[PWMD,11],[PWMD,10],[PWME,11],[PWME,10] ],
-    ["5i23", "5i23", "SVST8_4", "5i23", "hm2_pci", 8,3, 0,0, 8,3, 0,0, 4,6, 0,0, 0,0,0,0,0,0,0,0, 1, 72, 48, 96, [2,3,4],
-        [ENCB,1],[ENCA,1],[ENCB,0],[ENCA,0],[ENCI,1],[ENCI,0],[PWMP,1],[PWMP,0],[PWMD,1],[PWMD,0],[PWME,1],[PWME,0],
-                 [ENCB,3],[ENCA,3],[ENCB,2],[ENCA,2],[ENCI,3],[ENCI,2],[PWMP,3],[PWMP,2],[PWMD,3],[PWMD,2],[PWME,3],[PWME,2],
-        [ENCB,5],[ENCA,5],[ENCB,4],[ENCA,4],[ENCI,5],[ENCI,4],[PWMP,5],[PWMP,4],[PWMD,5],[PWMD,4],[PWME,5],[PWME,4],
-                 [ENCB,7],[ENCA,7],[ENCB,6],[ENCA,6],[ENCI,7],[ENCI,6],[PWMP,7],[PWMP,6],[PWMD,7],[PWMD,6],[PWME,7],[PWME,6],
-        [STEPA,0],[STEPB,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[STEPA,1],[STEPB,1],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],
-                  [STEPA,2],[STEPB,2],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[STEPA,3],[STEPB,3],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0] ],
-    ["5i23", "5i23", "SVST4_8", "5i23", "hm2_pci", 4,3, 0,0, 4,3, 0,0, 8,6, 0,0, 0,0,0,0,0,0,0,0, 1, 72, 48, 96, [2,3,4],
-       [ENCB,1],[ENCA,1],[ENCB,0],[ENCA,0],[ENCI,1],[ENCI,0],[PWMP,1],[PWMP,0],[PWMD,1],[PWMD,0],[PWME,1],[PWME,0],
-                [ENCB,3],[ENCA,3],[ENCB,2],[ENCA,2],[ENCI,3],[ENCI,2],[PWMP,3],[PWMP,2],[PWMD,3],[PWMD,2],[PWME,3],[PWME,2],
-       [STEPA,0],[STEPB,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[STEPA,1],[STEPB,1],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],
-                 [STEPA,2],[STEPB,2],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[STEPA,3],[STEPB,3],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],
-       [STEPA,4],[STEPB,4],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[STEPA,5],[STEPB,5],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],
-                 [STEPA,6],[STEPB,6],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[STEPA,7],[STEPB,7],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0] ],
-    ["7i43-2", "7i43", "SV8", "7i43-2", "hm2_7i43", 8,3, 0,0, 8,3, 0,0, 0,0, 0,0, 0,0,0,0,0,0,0,0, 1, 48, 50, 100, [4,3],
-        [ENCB,1],[ENCA,1],[ENCB,0],[ENCA,0],[ENCI,1],[ENCI,0],[PWMP,1],[PWMP,0],[PWMD,1],[PWMD,0],[PWME,1],[PWME,0],
-                 [ENCB,3],[ENCA,3],[ENCB,2],[ENCA,2],[ENCI,3],[ENCI,2],[PWMP,3],[PWMP,2],[PWMD,3],[PWMD,2],[PWME,3],[PWME,2],
-        [ENCB,5],[ENCA,5],[ENCB,4],[ENCA,4],[ENCI,5],[ENCI,4],[PWMP,5],[PWMP,4],[PWMD,5],[PWMD,4],[PWME,5],[PWME,4],
-                 [ENCB,7],[ENCA,7],[ENCB,6],[ENCA,6],[ENCI,7],[ENCI,6],[PWMP,7],[PWMP,6],[PWMD,7],[PWMD,6],[PWME,7],[PWME,6] ],
-    ["7i43-2", "7i43", "SVST4_4", "7i43-2", "hm2_7i43", 4,3, 0,0, 4,3, 0,0, 4,6, 0,0, 0,0,0,0,0,0,0,0, 1, 48, 50, 100, [4,3],
-        [ENCB,1],[ENCA,1],[ENCB,0],[ENCA,0],[ENCI,1],[ENCI,0],[PWMP,1],[PWMP,0],[PWMD,1],[PWMD,0],[PWME,1],[PWME,0],
-                 [ENCB,3],[ENCA,3],[ENCB,2],[ENCA,2],[ENCI,3],[ENCI,2],[PWMP,3],[PWMP,2],[PWMD,3],[PWMD,2],[PWME,3],[PWME,2],
-        [STEPA,0],[STEPB,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[STEPA,1],[STEPB,1],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],
-                  [STEPA,2],[STEPB,2],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[STEPA,3],[STEPB,3],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0] ],
-    ["7i43-2", "7i43", "SVST4_6", "7i43-2", "hm2_7i43", 4,4, 0,0, 6,6, 0,0, 3,4, 0,0, 0,0,0,0,0,0,0,0, 1, 48, 50, 100, [4,3],
-        [ENCB,1],[ENCA,1],[ENCB,0],[ENCA,0],[ENCI,1],[ENCI,0],[PWMP,1],[PWMP,0],[PWMD,1],[PWMD,0],[PWME,1],[PWME,0],
-                 [ENCB,3],[ENCA,3],[ENCB,2],[ENCA,2],[ENCI,3],[ENCI,2],[PWMP,3],[PWMP,2],[PWMD,3],[PWMD,2],[PWME,3],[PWME,2],
-        [STEPA,0],[STEPB,0],[GPIOI,0],[GPIOI,0],[STEPA,1],[STEPB,1],[GPIOI,0],[GPIOI,0],[STEPA,2],[STEPB,2],[GPIOI,0],[GPIOI,0],
-                  [STEPA,3],[STEPB,3],[GPIOI,0],[GPIOI,0],[STEPA,4],[STEPB,4],[GPIOI,0],[GPIOI,0],[STEPA,5],[STEPB,5],[GPIOI,0],[GPIOI,0] ],
-    ["7i43-4", "7i43", "SV8", "7i43-4", "hm2_7i43", 8,3, 0,0, 8,3, 0,0, 0,0, 0,0, 0,0,0,0,0,0,0,0, 1, 48, 50, 100, [4,3],
-        [ENCB,1],[ENCA,1],[ENCB,0],[ENCA,0],[ENCI,1],[ENCI,0],[PWMP,1],[PWMP,0],[PWMD,1],[PWMD,0],[PWME,1],[PWME,0],
-                 [ENCB,3],[ENCA,3],[ENCB,2],[ENCA,2],[ENCI,3],[ENCI,2],[PWMP,3],[PWMP,2],[PWMD,3],[PWMD,2],[PWME,3],[PWME,2],
-        [ENCB,5],[ENCA,5],[ENCB,4],[ENCA,4],[ENCI,5],[ENCI,4],[PWMP,5],[PWMP,4],[PWMD,5],[PWMD,4],[PWME,5],[PWME,4],
-                 [ENCB,7],[ENCA,7],[ENCB,6],[ENCA,6],[ENCI,7],[ENCI,6],[PWMP,7],[PWMP,6],[PWMD,7],[PWMD,6],[PWME,7],[PWME,6] ],
-    ["7i43-4", "7i43", "SVST4_4", "7i43-4", "hm2_7i43", 4,3, 0,0, 4,3, 0,0, 4,6, 0,0, 0,0,0,0,0,0,0,0, 1, 48, 50, 100, [4,3],
-        [ENCB,1],[ENCA,1],[ENCB,0],[ENCA,0],[ENCI,1],[ENCI,0],[PWMP,1],[PWMP,0],[PWMD,1],[PWMD,0],[PWME,1],[PWME,0],
-                 [ENCB,3],[ENCA,3],[ENCB,2],[ENCA,2],[ENCI,3],[ENCI,2],[PWMP,3],[PWMP,2],[PWMD,3],[PWMD,2],[PWME,3],[PWME,2],
-        [STEPA,0],[STEPB,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[STEPA,1],[STEPB,1],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],
-                  [STEPA,2],[STEPB,2],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[STEPA,3],[STEPB,3],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0] ],
-    ["7i43-4", "7i43", "SVST4_6", "7i43-4", "hm2_7i43", 4,3, 0,0, 4,3, 0,0, 6,4, 0,0, 0,0,0,0,0,0,0,0, 1, 48, 50, 100, [4,3],
-        [ENCB,1],[ENCA,1],[ENCB,0],[ENCA,0],[ENCI,1],[ENCI,0],[PWMP,1],[PWMP,0],[PWMD,1],[PWMD,0],[PWME,1],[PWME,0],
-                 [ENCB,3],[ENCA,3],[ENCB,2],[ENCA,2],[ENCI,3],[ENCI,2],[PWMP,3],[PWMP,2],[PWMD,3],[PWMD,2],[PWME,3],[PWME,2],
-        [STEPA,0],[STEPB,0],[GPIOI,0],[GPIOI,0],[STEPA,1],[STEPB,1],[GPIOI,0],[GPIOI,0],[STEPA,2],[STEPB,2],[GPIOI,0],[GPIOI,0],
-                  [STEPA,3],[STEPB,3],[GPIOI,0],[GPIOI,0],[STEPA,4],[STEPB,4],[GPIOI,0],[GPIOI,0],[STEPA,5],[STEPB,5],[GPIOI,0],[GPIOI,0] ],
-    ["7i43-4", "7i43", "SVST4_12", "7i43-4", "hm2_7i43", 4,3, 0,0, 4,3, 0,0, 12,2, 0,0, 0,0,0,0,0,0,0,0, 1, 48, 50, 100, [4,3],
-        [ENCB,1],[ENCA,1],[ENCB,0],[ENCA,0],[ENCI,1],[ENCI,0],[PWMP,1],[PWMP,0],[PWMD,1],[PWMD,0],[PWME,1],[PWME,0],
-                 [ENCB,3],[ENCA,3],[ENCB,2],[ENCA,2],[ENCI,3],[ENCI,2],[PWMP,3],[PWMP,2],[PWMD,3],[PWMD,2],[PWME,3],[PWME,2],
-        [STEPA,0],[STEPB,0],[STEPA,1],[STEPB,1],[STEPA,2],[STEPB,2],[STEPA,3],[STEPB,3],[STEPA,4],[STEPB,4],[STEPA,5],[STEPB,5],
-                  [STEPA,6],[STEPB,6],[STEPA,7],[STEPB,7],[STEPA,8],[STEPB,8],[STEPA,9],[STEPB,9],[STEPA,10],[STEPB,10],[STEPA,11],[STEPB,11] ],
-    ["3x20-1", "3x20", "SV24", "3x20-1", "hm2_pci", 24,3, 0,0, 24,3, 0,0, 0,0, 0,0, 0,0,0,0,0,0,0,0, 1, 144, 50, 100, [4,5,6,9,8,7],
-        [ENCB,1],[ENCA,1],[ENCB,0],[ENCA,0],[ENCI,1],[ENCI,0],[PWMP,1],[PWMP,0],[PWMD,1],[PWMD,0],[PWME,1],[PWME,0],
-                 [ENCB,3],[ENCA,3],[ENCB,2],[ENCA,2],[ENCI,3],[ENCI,2],[PWMP,3],[PWMP,2],[PWMD,3],[PWMD,2],[PWME,3],[PWME,2],
-        [ENCB,5],[ENCA,5],[ENCB,4],[ENCA,4],[ENCI,5],[ENCI,4],[PWMP,5],[PWMP,4],[PWMD,5],[PWMD,4],[PWME,5],[PWME,4],
-                 [ENCB,7],[ENCA,7],[ENCB,6],[ENCA,6],[ENCI,7],[ENCI,6],[PWMP,7],[PWMP,6],[PWMD,7],[PWMD,6],[PWME,7],[PWME,6],
-        [ENCB,9],[ENCA,9],[ENCB,8],[ENCA,8],[ENCI,9],[ENCI,8],[PWMP,9],[PWMP,8],[PWMD,9],[PWMD,8],[PWME,9],[PWME,8],
-                 [ENCB,11],[ENCA,11],[ENCB,10],[ENCA,10],[ENCI,11],[ENCI,10],[PWMP,11],[PWMP,10],[PWMD,11],[PWMD,10],[PWME,11],[PWME,10],
-        [ENCB,13],[ENCA,13],[ENCB,12],[ENCA,12],[ENCI,13],[ENCI,12],[PWMP,13],[PWMP,12],[PWMD,13],[PWMD,12],[PWME,13],[PWME,12],
-                 [ENCB,15],[ENCA,15],[ENCB,14],[ENCA,14],[ENCI,15],[ENCI,14],[PWMP,15],[PWMP,14],[PWMD,15],[PWMD,14],[PWME,15],[PWME,14],
-        [ENCB,17],[ENCA,17],[ENCB,16],[ENCA,16],[ENCI,17],[ENCI,16],[PWMP,17],[PWMP,16],[PWMD,17],[PWMD,16],[PWME,17],[PWME,16],
-                 [ENCB,19],[ENCA,19],[ENCB,18],[ENCA,18],[ENCI,19],[ENCI,18],[PWMP,19],[PWMP,18],[PWMD,19],[PWMD,18],[PWME,19],[PWME,18],
-        [ENCB,21],[ENCA,21],[ENCB,20],[ENCA,20],[ENCI,21],[ENCI,20],[PWMP,21],[PWMP,20],[PWMD,21],[PWMD,20],[PWME,21],[PWME,20],
-                 [ENCB,23],[ENCA,23],[ENCB,22],[ENCA,22],[ENCI,23],[ENCI,22],[PWMP,23],[PWMP,22],[PWMD,23],[PWMD,22],[PWME,23],[PWME,22] ],
-    ["3x20-1", "3x20", "SVST16_24", "3x20-1", "hm2_pci", 16,3, 0,0, 16,3, 0,0, 24,2, 0,0, 0,0,0,0,0,0,0,0, 1, 144, 50, 100, [4,5,6,9,8,7],
-        [ENCB,1],[ENCA,1],[ENCB,0],[ENCA,0],[ENCI,1],[ENCI,0],[PWMP,1],[PWMP,0],[PWMD,1],[PWMD,0],[PWME,1],[PWME,0],
-                 [ENCB,3],[ENCA,3],[ENCB,2],[ENCA,2],[ENCI,3],[ENCI,2],[PWMP,3],[PWMP,2],[PWMD,3],[PWMD,2],[PWME,3],[PWME,2],
-        [ENCB,5],[ENCA,5],[ENCB,4],[ENCA,4],[ENCI,5],[ENCI,4],[PWMP,5],[PWMP,4],[PWMD,5],[PWMD,4],[PWME,5],[PWME,4],
-                 [ENCB,7],[ENCA,7],[ENCB,6],[ENCA,6],[ENCI,7],[ENCI,6],[PWMP,7],[PWMP,6],[PWMD,7],[PWMD,6],[PWME,7],[PWME,6],
-        [ENCB,9],[ENCA,9],[ENCB,8],[ENCA,8],[ENCI,9],[ENCI,8],[PWMP,9],[PWMP,8],[PWMD,9],[PWMD,8],[PWME,9],[PWME,8],
-                 [ENCB,11],[ENCA,11],[ENCB,10],[ENCA,10],[ENCI,11],[ENCI,10],[PWMP,11],[PWMP,10],[PWMD,11],[PWMD,10],[PWME,11],[PWME,10],
-        [ENCB,13],[ENCA,13],[ENCB,12],[ENCA,12],[ENCI,13],[ENCI,12],[PWMP,13],[PWMP,12],[PWMD,13],[PWMD,12],[PWME,13],[PWME,12],
-                 [ENCB,15],[ENCA,15],[ENCB,14],[ENCA,14],[ENCI,15],[ENCI,14],[PWMP,15],[PWMP,14],[PWMD,15],[PWMD,14],[PWME,15],[PWME,14],
-        [STEPA,0],[STEPB,0],[STEPA,1],[STEPB,1],[STEPA,2],[STEPB,2],[STEPA,3],[STEPB,3],[STEPA,4],[STEPB,4],[STEPA,5],[STEPB,5],
-                [STEPA,6],[STEPB,6],[STEPA,7],[STEPB,7],[STEPA,8],[STEPB,8],[STEPA,9],[STEPB,9],[STEPA,10],[STEPB,10],[STEPA,11],[STEPB,11],
-        [STEPA,12],[STEPB,12],[STEPA,13],[STEPB,13],[STEPA,14],[STEPB,14],[STEPA,15],[STEPB,15],[STEPA,16],[STEPB,16],[STEPA,17],[STEPB,17],
-                [STEPA,18],[STEPB,18],[STEPA,19],[STEPB,19],[STEPA,20],[STEPB,20],[STEPA,21],[STEPB,21],[STEPA,22],[STEPB,22],[STEPA,23],[STEPB,23] ],
+      [ENCB,1],[ENCA,1],[ENCB,0],[ENCA,0],[ENCI,1],[ENCI,0],[PWMP,1],[PWMP,0],[PWMD,1],[PWMD,0],[PWME,1],[PWME,0],
+      [ENCB,3],[ENCA,3],[ENCB,2],[ENCA,2],[ENCI,3],[ENCI,2],[PWMP,3],[PWMP,2],[PWMD,3],[PWMD,2],[PWME,3],[PWME,2],
+      [ENCB,5],[ENCA,5],[ENCB,4],[ENCA,4],[ENCI,5],[ENCI,4],[PWMP,5],[PWMP,4],[PWMD,5],[PWMD,4],[PWME,5],[PWME,4],
+      [ENCB,7],[ENCA,7],[ENCB,6],[ENCA,6],[ENCI,7],[ENCI,6],[PWMP,7],[PWMP,6],[PWMD,7],[PWMD,6],[PWME,7],[PWME,6],
+      [STEPA,0],[STEPB,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[STEPA,1],[STEPB,1],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],
+      [STEPA,2],[STEPB,2],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0],[STEPA,3],[STEPB,3],[GPIOI,0],[GPIOI,0],[GPIOI,0],[GPIOI,0]
+     ],
 
 ]
 _SUBBOARDNAME = 0; _SUBFIRMNAME = 1; _SUBMODE = 2;_SUBCONLIST = 3;_SUBSTARTOFDATA = 12 # 4-10 spare for now.
@@ -434,9 +340,9 @@ mesadaughterdata = [ ["8i20", "8i20", 0,[_("Axis Selection"),"Not Used","Not Use
     [NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0],[NUSED,0] ],
 ["error"]
  ]
-
+mesafirmwaredata = []
 custommesafirmwaredata = []
-mesaboardnames = [ "5i20", "5i22-1", "5i22-1.5", "5i23", "7i43-2", "7i43-4","3x20-1" ]
+mesaboardnames = []
 
 (UNUSED_UNUSED,UNUSED_DUMMY) = hal_notused_names = ["unused-unused","unused_dummy"]
 human_notused_names = [ [_("Unused Unused"),[] ] ]
@@ -1007,6 +913,8 @@ class Data:
         self.s32out = 10
         self.floatsin = 10
         self.floatsout = 10
+        self.bitmem = 50
+        self.wordmem = 50
         self.tempexists = 0 # not present ( a blank CL program edited through pncconf)
         self.laddername = "custom.clp"
         self.modbus = 0 # not included
@@ -1050,22 +958,22 @@ class Data:
 
         self.number_mesa = 1 # number of cards
         # for first mesa card
-        self.mesa0_currentfirmwaredata = mesafirmwaredata[1]       
-        self.mesa0_boardtitle = "5i20"        
-        self.mesa0_firmware = "SVST8_4"
+        self.mesa0_currentfirmwaredata = mesafirmwaredata_internal[0]
+        self.mesa0_boardtitle = "5i20-Internal Data"    
+        self.mesa0_firmware = mesafirmwaredata_internal[0][2]
         self.mesa0_parportaddrs = "0x378"
         self.mesa0_isawatchdog = 1
         self.mesa0_pwm_frequency = 20000
         self.mesa0_pdm_frequency = 6000000
         self.mesa0_3pwm_frequency = 20000
         self.mesa0_watchdog_timeout = 10000000
-        self.mesa0_numof_encodergens = 4
+        self.mesa0_numof_encodergens = 1
         self.mesa0_numof_resolvers = 0
-        self.mesa0_numof_pwmgens = 4
+        self.mesa0_numof_pwmgens = 0
         self.mesa0_numof_tppwmgens = 0
-        self.mesa0_numof_stepgens = 0
-        self.mesa0_numof_sserialports = 0
-        self.mesa0_numof_sserialchannels = 8
+        self.mesa0_numof_stepgens = 5
+        self.mesa0_numof_sserialports = 1
+        self.mesa0_numof_sserialchannels = 2
         self.mesa0_sanity_7i29 = False
         self.mesa0_sanity_7i30 = False
         self.mesa0_sanity_7i33 = True
@@ -1073,22 +981,22 @@ class Data:
         self.mesa0_sanity_7i48 = False
 
         # second mesa card
-        self.mesa1_currentfirmwaredata = mesafirmwaredata[1]
-        self.mesa1_boardtitle = "5i20"
-        self.mesa1_firmware = "SVST8_4"
+        self.mesa1_currentfirmwaredata = mesafirmwaredata_internal[0]
+        self.mesa1_boardtitle = "5i20-Internal Data"        
+        self.mesa1_firmware = mesafirmwaredata_internal[0][2]
         self.mesa1_parportaddrs = "0x378"
         self.mesa1_isawatchdog = 1
         self.mesa1_pwm_frequency = 20000
         self.mesa1_pdm_frequency = 6000000
         self.mesa1_3pwm_frequency = 20000
         self.mesa1_watchdog_timeout = 10000000
-        self.mesa1_numof_encodergens = 4
+        self.mesa1_numof_encodergens = 1
         self.mesa1_numof_resolvers = 0
-        self.mesa1_numof_pwmgens = 4
+        self.mesa1_numof_pwmgens = 0
         self.mesa1_numof_tppwmgens = 0
-        self.mesa1_numof_stepgens = 0
-        self.mesa1_numof_sserialports = 0
-        self.mesa1_numof_sserialchannels = 8
+        self.mesa1_numof_stepgens = 5
+        self.mesa1_numof_sserialports = 1
+        self.mesa1_numof_sserialchannels = 2
         self.mesa1_sanity_7i29 = False
         self.mesa1_sanity_7i30 = False
         self.mesa1_sanity_7i33 = False
@@ -1636,6 +1544,13 @@ If you have a REALLY large config that you wish to convert to this newer version
         if not letter == "s" or (letter == "s" and stepgen):
             print >>file, "MAX_VELOCITY = %s" % get("maxvel")
             print >>file, "MAX_ACCELERATION = %s" % get("maxacc")
+            print >>file, "# The values below should be 25% larger than MAX_VELOCITY and MAX_ACCELERATION"
+            print >>file, "# If using BACKLASH compensation STEPGEN_MAXACCEL should be 100% larger."
+            print >>file, "STEPGEN_MAXVEL = %.1f" % (float(get("maxvel")) * 1.25)
+            if self[letter + "usecomp"] or self[letter + "usebacklash"]:
+                print >>file, "STEPGEN_MAXACCEL = %.1f" % (float(get("maxacc")) * 2.0)
+            else:
+                print >>file, "STEPGEN_MAXACCEL = %.1f" % (float(get("maxacc")) * 1.25)
         if encoder or resolver:
             if closedloop:
                 print >>file, "P = %s" % get("P")
@@ -1833,6 +1748,7 @@ If you have a REALLY large config that you wish to convert to this newer version
            return test
 
     def connect_axis(self, file, num, let):
+        def get(s): return self[let + s]
         axnum = "xyzabcuvws".index(let)
         title = 'AXIS'
         if let == 's':
@@ -2001,7 +1917,11 @@ If you have a REALLY large config that you wish to convert to this newer version
                 if closedloop:
                     print >>file, "net spindle-output      => " + potpinname + "spinout"
                 else:
-                    print >>file, "net spindle-vel-cmd     => " + potpinname + "spinout"
+                    if get("outputminlimit") == 0:
+                        signal = "spindle-vel-cmd-abs"
+                    else:
+                        signal = "spindle-vel-cmd"
+                    print >>file, "net %s     => %sspinout"%(signal,potpinname)
                 print >>file, "net machine-is-enabled      => " + potpinname +"spinena"
                 print >>file, "net spindle-ccw         => " + potpinname +"spindir"
                 print >>file
@@ -2017,20 +1937,29 @@ If you have a REALLY large config that you wish to convert to this newer version
                 print >>file, "setp   "+pwmpinname+"-maxlim    [%s_%d]OUTPUT_MAX_LIMIT"% (title, axnum)
                 print >>file
                 if let == 's':
+                    if get("outputminlimit") == 0:
+                        signal = "spindle-vel-cmd-abs"
+                    else:
+                        signal = "spindle-vel-cmd"
                     print >>file
                     if closedloop:
                         print >>file, "net spindle-output      => " + pwmpinname
-                        print >>file, "net machine-is-enabled      => " + rawpinname + "spinena"
+                        if 'analogout5' in pwmpinname: # on the 7i77 analog out 5 has it's own enable
+                            print >>file, "net machine-is-enabled      => " + rawpinname + "spinena"
                     else:
-                        print >>file, "net spindle-vel-cmd     => " + pwmpinname
+                        print >>file, "net %s     => %s"%(signal,pwmpinname)
                         print >>file, "net machine-is-enabled      => " + rawpinname + "spinena"
+                        if 'analogout5' in pwmpinname: # on the 7i77 analog out 5 has it's own enable
+                            print >>file, "net machine-is-enabled      => " + rawpinname + "spinena"
                 else:
                     print >>file, "net %s-output                             => "% (let) + pwmpinname
                     print >>file, "net %s-pos-cmd    axis.%d.motor-pos-cmd" % (let, axnum )
                     print >>file, "net %s-enable     axis.%d.amp-enable-out"% (let,axnum)
+                    if 'analogout5' in pwmpinname: # on the 7i77 analog out 5 has it's own enable
+                        print >>file, "net %s-enable   %spinena"% (let,rawpinname)
                     if let == "x":
                         print >>file, "# enable _all_ sserial pwmgens"
-                        print >>file, "net %s-enable   %sanalogena"% (let,rawpinname) 
+                        print >>file, "net %s-enable   %sanalogena"% (let,rawpinname)
                 print >>file
 
             else:
@@ -2074,8 +2003,8 @@ If you have a REALLY large config that you wish to convert to this newer version
                 print >>file, "setp   " + steppinname + ".maxaccel         [%s_%d]MAX_ACCELERATION"% (title, axnum)
                 print >>file, "setp   " + steppinname + ".maxvel           [%s_%d]MAX_VELOCITY"% (title, axnum)
             else:
-                print >>file, "setp   " + steppinname + ".maxaccel         %.1f"%( (self[let+"maxacc"]*1.25) )
-                print >>file, "setp   " + steppinname + ".maxvel           %.1f"%( (self[let+"maxvel"]*1.25) )
+                print >>file, "setp   " + steppinname + ".maxaccel         [%s_%d]STEPGEN_MAXACCEL"% (title, axnum)
+                print >>file, "setp   " + steppinname + ".maxvel           [%s_%d]STEPGEN_MAXVEL"% (title, axnum)
             for i in stepinvertlist:
                    print >>file, "setp    "+i+".invert_output true"
             if let == "s":
@@ -2112,8 +2041,8 @@ If you have a REALLY large config that you wish to convert to this newer version
                 print >>file, "setp   " + steppinname + ".control-type     1"
             else:
                 print >>file, "setp   " + steppinname + ".control-type     0"
-            print >>file, "setp   " + steppinname + ".maxaccel         %.1f"%( (self[let+"maxacc"]*1.25) )
-            print >>file, "setp   " + steppinname + ".maxvel           %.1f"%( (self[let+"maxvel"]*1.25) )
+            print >>file, "setp   " + steppinname + ".maxaccel         [%s_%d]STEPGEN_MAXACCEL"% (title, axnum)
+            print >>file, "setp   " + steppinname + ".maxvel           [%s_%d]STEPGEN_MAXVEL"% (title, axnum)
             for i in stepinvertlist2:
                    print >>file, "setp    "+i+".invert_output true"
             if closedloop:
@@ -2174,16 +2103,18 @@ If you have a REALLY large config that you wish to convert to this newer version
         if let =='s':
             print >>file, "# ---setup spindle control signals---" 
             print >>file
-            print >>file, "net spindle-vel-cmd-rps    <=  motion.spindle-speed-out-rps"
-            print >>file, "net spindle-vel-cmd        <=  motion.spindle-speed-out"
-            print >>file, "net spindle-on             <=  motion.spindle-on"
-            print >>file, "net spindle-cw             <=  motion.spindle-forward"
-            print >>file, "net spindle-ccw            <=  motion.spindle-reverse"
-            print >>file, "net spindle-brake          <=  motion.spindle-brake"            
-            print >>file, "net spindle-revs           =>  motion.spindle-revs"
-            print >>file, "net spindle-at-speed       =>  motion.spindle-at-speed"
-            print >>file, "net spindle-vel-fb         =>  motion.spindle-speed-in"
-            print >>file, "net spindle-index-enable  <=>  motion.spindle-index-enable"
+            print >>file, "net spindle-vel-cmd-rps        <=  motion.spindle-speed-out-rps"
+            print >>file, "net spindle-vel-cmd-rps-abs    <=  motion.spindle-speed-out-rps-abs"
+            print >>file, "net spindle-vel-cmd            <=  motion.spindle-speed-out"
+            print >>file, "net spindle-vel-cmd-rpm-abs    <=  motion.spindle-speed-out-abs"
+            print >>file, "net spindle-on                 <=  motion.spindle-on"
+            print >>file, "net spindle-cw                 <=  motion.spindle-forward"
+            print >>file, "net spindle-ccw                <=  motion.spindle-reverse"
+            print >>file, "net spindle-brake              <=  motion.spindle-brake"            
+            print >>file, "net spindle-revs               =>  motion.spindle-revs"
+            print >>file, "net spindle-at-speed           =>  motion.spindle-at-speed"
+            print >>file, "net spindle-vel-fb             =>  motion.spindle-speed-in"
+            print >>file, "net spindle-index-enable      <=>  motion.spindle-index-enable"
             print >>file
             if not self.findsignal("spindle-at-speed"):
                 print >>file, "# ---Setup spindle at speed signals---"
@@ -2211,12 +2142,6 @@ If you have a REALLY large config that you wish to convert to this newer version
                     print >>file, ("net spindle-fb-filtered-rps    lowpass.spindle.out      =>   abs.spindle.in")
                     print >>file, ("net spindle-fb-filtered-abs-rps    abs.spindle.out      =>   scale.spindle.in")
                     print >>file, ("net spindle-fb-filtered-abs-rpm    scale.spindle.out")
-                else:
-                    print >>file, _("#  Use COMMANDED spindle velocity from LinuxCNC because no spindle encoder was specified")
-                    print >>file, _("#  COMMANDED velocity is signed so we use absolute component to remove sign")
-                    print >>file
-                    print >>file, ("net spindle-vel-cmd         =>    abs.spindle.in")
-                    print >>file, ("net absolute-spindle-vel    <=    abs.spindle.out")
             return
 
         min_limsig = self.min_lim_sig(let)
@@ -2245,12 +2170,8 @@ If you have a REALLY large config that you wish to convert to this newer version
                         if i: print >>file, "net %s     <= %s-not" % (p, pinname)
                         else: print >>file, "net %s     <= %s" % (p, pinname)
                     elif "sserial" in pname:
-                        if "7i64" in pinname:
-                            if i: print >>file, "net %s     <=  "% (p)+pinname +".in-not"
-                            else: print >>file, "net %s     <=  "% (p)+pinname +".in"
-                        else:
-                            if i: print >>file, "net %s     <=  "% (p)+pinname +"-not"
-                            else: print >>file, "net %s     <=  "% (p)+pinname
+                        if i: print >>file, "net %s     <=  "% (p)+pinname +"-not"
+                        else: print >>file, "net %s     <=  "% (p)+pinname
                     else:
                         if i: print >>file, "net %s     <=  "% (p)+pinname +".in_not"
                         else: print >>file, "net %s     <=  "% (p)+pinname +".in"
@@ -2347,11 +2268,7 @@ If you have a REALLY large config that you wish to convert to this newer version
                             print >>file, "net %s %s"% (p,pinname)
                     else:
                         if "sserial" in pname:
-                            # different sserial have different endings
-                            if "7i64" in pinname:
-                                temp = pinname + ".out"
-                            else:
-                                temp = pinname
+                            temp = pinname
                         # mainboard GPIOO require extra setup commands
                         else:
                             print >>file, "setp %s true"% (pinname + ".is_output")
@@ -2364,10 +2281,7 @@ If you have a REALLY large config that you wish to convert to this newer version
                             print >>file, "net %s %s"% (p,temp)
                     if i: # invert pin
                         if "sserial" in pname: 
-                            if "7i64" in pinname:
-                                ending = ".invert"
-                            else:
-                                ending = "-invert"
+                            ending = "-invert"
                         elif "parport" in pinname: ending = "-invert"
                         else: ending = ".invert_output"
                         print >>file, "setp %s true"%  (pinname + ending )
@@ -2544,7 +2458,7 @@ If you have a REALLY large config that you wish to convert to this newer version
         firm0 = self.mesa0_currentfirmwaredata[_FIRMWARE]
         firm1 = self.mesa1_currentfirmwaredata[_FIRMWARE]
         # TODO fix this hardcoded hack: only one serial port
-        ssconfig0 = ssconfig1 = resolver0 = resolver1 = temp = ""
+        ssconfig0 = ssconfig1 = resolver0 = resolver1 = temp = mesa0_ioaddr = mesa1_ioaddr = ""
         if self.mesa0_numof_resolvers:
             resolver0 = "num_resolvers=%d"% self.mesa0_numof_resolvers
         if self.mesa1_numof_resolvers:
@@ -2571,22 +2485,31 @@ If you have a REALLY large config that you wish to convert to this newer version
                 else:
                     temp = temp + "x"
             ssconfig1 = "sserial_port_0=%s"% temp
+        if '7i43' in board0:
+             mesa0_ioaddr = ' ioaddr=%s ioaddr_hi=0 epp_wide=1'% self.mesa0_parportaddrs
+        if '7i43' in board1:
+             mesa1_ioaddr = ' ioaddr=%s ioaddr_hi=0 epp_wide=1'% self.mesa1_parportaddrs
         firmstring0 = firmstring1 = ""
         if not "5i25" in board0:
             firmstring0 = "firmware=hm2/%s/%s.BIT" % (directory0, firm0)
         if not "5i25" in board1:
             firmstring1 = "firmware=hm2/%s/%s.BIT" % (directory1, firm1)
         if self.number_mesa == 1:            
-            print >>file, """loadrt %s config="%s num_encoders=%d num_pwmgens=%d num_3pwmgens=%d num_stepgens=%d %s %s" """ % (
-                    driver0, firmstring0, self.mesa0_numof_encodergens, self.mesa0_numof_pwmgens, self.mesa0_numof_tppwmgens, self.mesa0_numof_stepgens ,ssconfig0, resolver0)
+            print >>file, """loadrt %s%s config="%s num_encoders=%d num_pwmgens=%d num_3pwmgens=%d num_stepgens=%d %s %s" """ % (
+                    driver0, mesa0_ioaddr, firmstring0, self.mesa0_numof_encodergens, self.mesa0_numof_pwmgens, self.mesa0_numof_tppwmgens,
+                    self.mesa0_numof_stepgens ,ssconfig0, resolver0)
         elif self.number_mesa == 2 and (driver0 == driver1):
-            print >>file, """loadrt %s config="%s num_encoders=%d num_pwmgens=%d num_3pwmgens=%d num_stepgens=%d %s %s,%s num_encoders=%d num_pwmgens=%d num_3pwmgens=%d num_stepgens=%d %s %s"
-                    """ % ( driver0, firmstring0, self.mesa0_numof_encodergens, self.mesa0_numof_pwmgens, self.mesa0_numof_tppwmgens, self.mesa0_numof_stepgens, ssconfig0, resolver0,firmstring1, self.mesa1_numof_encodergens, self.mesa1_numof_pwmgens, self.mesa1_numof_tppwmgens, self.mesa1_numof_stepgens, ssconfig1, resolver1 )
+            print >>file, """loadrt %s%s config="%s num_encoders=%d num_pwmgens=%d num_3pwmgens=%d num_stepgens=%d %s %s,%s%s num_encoders=%d       num_pwmgens=%d num_3pwmgens=%d num_stepgens=%d %s %s"
+                    """ % ( driver0, mesa0_ioaddr, firmstring0, self.mesa0_numof_encodergens, self.mesa0_numof_pwmgens, self.mesa0_numof_tppwmgens,
+                    self.mesa0_numof_stepgens, ssconfig0, resolver0, mesa1_ioaddr,firmstring1, self.mesa1_numof_encodergens,
+                    self.mesa1_numof_pwmgens, self.mesa1_numof_tppwmgens, self.mesa1_numof_stepgens, ssconfig1, resolver1 )
         elif self.number_mesa == 2:
-            print >>file, """loadrt %s config="%s num_encoders=%d num_pwmgens=%d num_3pwmgens=%d num_stepgens=%d %s %s" """ % (
-                    driver0, firmstring0, self.mesa0_numof_encodergens, self.mesa0_numof_pwmgens, self.mesa0_numof_tppwmgens,self.mesa0_numof_stepgens, ssconfig0, resolver0 )
-            print >>file, """loadrt %s config="%s num_encoders=%d num_pwmgens=%d num_3pwmgens=%d num_stepgens=%d %s %s" """ % (
-                    driver1, firmstring1, self.mesa1_numof_encodergens, self.mesa1_numof_pwmgens, self.mesa0_numof_tppwmgens,self.mesa1_numof_stepgens, ssconfig1, resolver1 )
+            print >>file, """loadrt %s%s config="%s num_encoders=%d num_pwmgens=%d num_3pwmgens=%d num_stepgens=%d %s %s" """ % (
+                    driver0, mesa0_ioaddr, firmstring0, self.mesa0_numof_encodergens, self.mesa0_numof_pwmgens,
+                    self.mesa0_numof_tppwmgens,self.mesa0_numof_stepgens, ssconfig0, resolver0 )
+            print >>file, """loadrt %s%s config="%s num_encoders=%d num_pwmgens=%d num_3pwmgens=%d num_stepgens=%d %s %s" """ % (
+                    driver1, mesa1_ioaddr, firmstring1, self.mesa1_numof_encodergens, self.mesa1_numof_pwmgens,
+                    self.mesa0_numof_tppwmgens,self.mesa1_numof_stepgens, ssconfig1, resolver1 )
         for boardnum in range(0,int(self.number_mesa)):
             if boardnum == 1 and (board0 == board1):
                 halnum = 1
@@ -2683,8 +2606,8 @@ If you have a REALLY large config that you wish to convert to this newer version
             if self.userneededbldc:
                     self._bldcconfigstring = self._bldcconfigstring + self.userneededbldc + ","
             temp = self._bldcconfigstring.rstrip(",")
-            self._bldcconfigstring = temp
-            print >>file, "loadrt bldc cfg=%s"% temp
+            if not temp == "":
+                print >>file, "loadrt bldc cfg=%s"% temp
 
         if (self.pyvcp and self.pyvcpconnect == 1) or self.gladevcp or self.userneededabs >0:
             self.absnames=""
@@ -2699,7 +2622,8 @@ If you have a REALLY large config that you wish to convert to this newer version
                 self.absnames = self.absnames+"abs.%d"% (i)
                 if i <> self.userneededabs-1:
                     self.absnames = self.absnames+","
-            print >>file, "loadrt abs names=%s"% self.absnames
+            if not self.absnames == "":
+                print >>file, "loadrt abs names=%s"% self.absnames
 
         if (self.pyvcp and self.pyvcpconnect == 1) or self.gladevcp or self.userneededlowpass >0:
             self.lowpassnames=""
@@ -2712,7 +2636,8 @@ If you have a REALLY large config that you wish to convert to this newer version
                 self.lowpassnames=self.lowpassnames+"lowpass.spindle"
             temp = self.lowpassnames.rstrip(",")
             self.lowpassnames = temp
-            print >>file, "loadrt lowpass names=%s"% temp
+            if not self.lowpassnames == "":
+                print >>file, "loadrt lowpass names=%s"% temp
 
         pytest = self.pyvcp and self.pyvcphaltype == 1 and self.pyvcpconnect == 1
         gladetest = self.gladevcp and self.spindlespeedbar
@@ -2733,7 +2658,9 @@ If you have a REALLY large config that you wish to convert to this newer version
         if not at_speed and self.suseatspeed:
             print >>file, "loadrt near"
         if self.classicladder:
-            print >>file, "loadrt classicladder_rt numPhysInputs=%d numPhysOutputs=%d numS32in=%d numS32out=%d numFloatIn=%d numFloatOut=%d" %(self.digitsin , self.digitsout , self.s32in, self.s32out, self.floatsin, self.floatsout)
+            print >>file, ("loadrt classicladder_rt numPhysInputs=%d numPhysOutputs=%d numS32in=%d"
+                          " numS32out=%d numFloatIn=%d numFloatOut=%d numBits=%d numWords=%d") \
+                          %(self.digitsin , self.digitsout , self.s32in, self.s32out, self.floatsin, self.floatsout,self.bitmem,self.wordmem)
         
         if self.externalmpg or self.externalfo or self.externalmvo or self.externalso or self.joystickjog or self.userneededmux16 > 0:
             self.mux16names=""
@@ -2961,12 +2888,13 @@ If you have a REALLY large config that you wish to convert to this newer version
         # check for shared MPG 
         pinname = self.make_pinname(self.findsignal("select-mpg-a"))
         if pinname:
+            print "shared MPG", pinname
             ending = ""
-            if "encoder" in pinname: ending = ".count"
+            if "enc" in pinname: ending = ".count"
             print >>file, "# ---jogwheel signals to mesa encoder - shared MPG---"
             print >>file
             print >>file, "net joint-selected-count     <=  %s%s"% (pinname,ending)
-            if ending:
+            if 'encoder' in ending:
                 print >>file, "setp    %s.filter true" % pinname
                 print >>file, "setp    %s.counter-mode true" % pinname
             print >>file
@@ -2989,11 +2917,11 @@ If you have a REALLY large config that you wish to convert to this newer version
                 pinname = self.make_pinname(self.findsignal(axletter+"-mpg-a"))
                 if pinname:
                     ending = ""
-                    if "encoder" in pinname: ending = ".count"
+                    if "enc" in pinname: ending = ".count"
                     print >>file, "# ---jogwheel signals to mesa encoder - %s axis MPG---"% axletter
                     print >>file
                     print >>file, "net %s-jog-count          <=  %s%s"% (axletter, pinname,ending)
-                    if ending:
+                    if 'encoder' in ending:
                         print >>file, "setp    %s.filter true" % pinname
                         print >>file, "setp    %s.counter-mode false" % pinname
                     print >>file
@@ -3032,11 +2960,11 @@ If you have a REALLY large config that you wish to convert to this newer version
         pinname = self.make_pinname(self.findsignal("fo-mpg-a"))
         if pinname:
             ending = ""
-            if "encoder" in pinname: ending = ".count"
+            if "enc" in pinname: ending = ".count"
             print >>file, "# ---feed override signals to mesa encoder - mpg---"
             print >>file
             print >>file, "net fo-count     <=  %s%s"% (pinname,ending)
-            if ending:
+            if 'encoder' in ending:
                 print >>file, "setp    %s.filter true" % pinname
                 print >>file, "setp    %s.counter-mode true" % pinname
             print >>file
@@ -3082,11 +3010,11 @@ If you have a REALLY large config that you wish to convert to this newer version
         pinname = self.make_pinname(self.findsignal("mvo-mpg-a"))
         if pinname:
             ending = ""
-            if "encoder" in pinname: ending = ".count"
+            if "enc" in pinname: ending = ".count"
             print >>file, "# ---max velocity override signals to mesa encoder - mpg---"
             print >>file
             print >>file, "net mvo-count     <=  %s%s"% (pinname,ending)
-            if ending:
+            if 'encoder' in ending:
                 print >>file, "setp    %s.filter true" % pinname
                 print >>file, "setp    %s.counter-mode true" % pinname
             print >>file
@@ -3136,11 +3064,11 @@ If you have a REALLY large config that you wish to convert to this newer version
         pinname = self.make_pinname(self.findsignal("so-mpg-a"))
         if pinname:
             ending = ""
-            if "encoder" in pinname: ending = ".count"
+            if "enc" in pinname: ending = ".count"
             print >>file, "# ---spindle override signals to mesa encoder - mpg---"
             print >>file
             print >>file, "net so-count     <=  %s%s"% (pinname,ending)
-            if ending:
+            if 'encoder' in ending:
                 print >>file, "setp    %s.filter true" % pinname
                 print >>file, "setp    %s.counter-mode true" % pinname
             print >>file
@@ -3287,7 +3215,7 @@ If you have a REALLY large config that you wish to convert to this newer version
                     if spindle_enc:
                         print >>f1, ("net spindle-fb-filtered-abs-rpm       =>   gladevcp.spindle-speed")
                     else:
-                        print >>f1, ("net absolute-spindle-vel    =>    gladevcp.spindle-speed")
+                        print >>f1, ("net spindle-vel-cmd-rpm-abs    =>    gladevcp.spindle-speed")
                 if self.spindleatspeed:
                     print >>f1, ("net spindle-at-speed        =>    gladevcp.spindle-at-speed-led")
                 i = 0
@@ -3354,7 +3282,7 @@ If you have a REALLY large config that you wish to convert to this newer version
             if spindle_enc:
                 print >>f1, ("net spindle-fb-filtered-abs-rpm       =>   pyvcp.spindle-speed")
             else:
-                print >>f1, ("net absolute-spindle-vel    =>    pyvcp.spindle-speed")
+                print >>f1, ("net spindle-vel-cmd-rpm-abs    =>    pyvcp.spindle-speed")
             print >>f1, ("net spindle-at-speed        =>    pyvcp.spindle-at-speed-led")
             print >>f1
             print >>f1, _("# **** Setup of spindle speed display using pyvcp -END ****")
@@ -3813,14 +3741,7 @@ Choosing no will mean AXIS options such as size/position and force maximum might
                     return None
                 # if gpionumber flag is true - convert to gpio pin name
                 if gpionumber or ptype in(GPIOI,GPIOO,GPIOD):
-                    if "7i64" in(subboardname):
-                        if ptype in(GPIOO,GPIOD):
-                            comptype = "digout"
-                            pinnum = pinnum-24 # adjustment for 7i64 pin numbering of output pins vrs pnccnonf numbering
-                        if ptype == GPIOI:
-                            comptype = "digin"
-                        return "hm2_%s.%d.%s.%d.%d."% (boardname,halboardnum,subboardname,portnum,channel) + comptype+".%02d"% (pinnum)
-                    elif "7i77" in (subboardname) or "7i76" in(subboardname):
+                    if "7i77" in (subboardname) or "7i76" in(subboardname):
                         if ptype in(GPIOO,GPIOD):
                             comptype = "output"
                             if pinnum >15 and pinnum <24:
@@ -3832,7 +3753,7 @@ Choosing no will mean AXIS options such as size/position and force maximum might
                             if pinnum >23 and pinnum < 40:
                                 pinnum = pinnum-8
                         return "hm2_%s.%d.%s.%d.%d."% (boardname,halboardnum,subboardname,portnum,channel) + comptype+"-%02d"% (pinnum)
-                    elif "7i69" in (subboardname) or "7i73" in (subboardname):
+                    elif "7i69" in (subboardname) or "7i73" in (subboardname) or "7i64" in(subboardname):
                         if ptype in(GPIOO,GPIOD):
                             comptype = "output"
                             pinnum -= 24
@@ -3855,11 +3776,10 @@ Choosing no will mean AXIS options such as size/position and force maximum might
                     return "hm2_%s.%d.%s.%d.%d."% (boardname,halboardnum,subboardname,portnum,channel) + comptype+"%d"% (compnum)
                 elif ptype == (ANALOGIN):
                     if "7i64" in(subboardname):
-                        comptype = "adcin"
-                        return "hm2_%s.%d.%s.%d.%d."% (boardname,halboardnum,subboardname,portnum,channel) + comptype+".%02d"% (compnum)+".in"
+                        comptype = "analog"
                     else:
                         comptype = "analogin"
-                        return "hm2_%s.%d.%s.%d.%d."% (boardname,halboardnum,subboardname,portnum,channel) + comptype+"%d"% (compnum)
+                    return "hm2_%s.%d.%s.%d.%d."% (boardname,halboardnum,subboardname,portnum,channel) + comptype+"%d"% (compnum)
                 elif ptype == (ENCA):
                     comptype = "enc"
                     return "hm2_%s.%d.%s.%d.%d."% (boardname,halboardnum,subboardname,portnum,channel) + comptype+"%d"% (compnum)
@@ -3887,7 +3807,7 @@ Choosing no will mean AXIS options such as size/position and force maximum might
                 if gpionumber or ptype in(GPIOI,GPIOO,GPIOD):
                     comptype = "gpio"
                     if '5i25' in boardname:
-                        compnum = int(pinnum)+(concount*16)
+                        compnum = int(pinnum)+(concount*17)
                     else:
                         compnum = int(pinnum)+(concount*24)
                     return "hm2_%s.%d."% (boardname,halboardnum) + comptype+".%03d"% (compnum)          
@@ -4055,10 +3975,11 @@ class App:
             gtk.main_iteration()
 
     def __init__(self, debug=0):
-        print 'debug=',debug
         if debug:
-            global _DEBUGSTRING
-            _DEBUGSTRING = ['all']
+           print 'PNCconf debug -ALL'
+           global _DEBUGSTRING
+           _DEBUGSTRING = ['all']
+
         gnome.init("pncconf", "0.6") 
         
         self.splash_screen()
@@ -4133,9 +4054,9 @@ class App:
                 cb = "mesa%d_comp_update"% (boardnum)
                 i = "_mesa%dsignalhandler_comp_update"% (boardnum)
                 self.data[i] = int(self.widgets[cb].connect("clicked", self.on_mesa_component_value_changed,boardnum))
-                cb = "mesa%d_boardtitle"% (boardnum)
-                i = "_mesa%dsignalhandler_boardname_change"% (boardnum)
-                self.data[i] = int(self.widgets[cb].connect("changed", self.on_mesa_boardname_changed,boardnum))
+#                cb = "mesa%d_boardtitle"% (boardnum)
+#                i = "_mesa%dsignalhandler_boardname_change"% (boardnum)
+#                self.data[i] = int(self.widgets[cb].connect("changed", self.on_mesa_boardname_changed,boardnum))
                 cb = "mesa%d_firmware"% (boardnum)
                 i = "_mesa%dsignalhandler_firmware_change"% (boardnum)
                 self.data[i] = int(self.widgets[cb].connect("changed", self.on_mesa_firmware_changed,boardnum))
@@ -4288,36 +4209,38 @@ class App:
             self.warning_dialog(text,True)
 
     def check_for_rt(self,fussy=True):
-        actual_kernel = os.uname()[2]
-        if hal.is_sim == 1 :
-            if fussy:
-                self.warning_dialog(_("You are using a simulated-realtime version of LinuxCNC, so testing / tuning of external hardware is unavailable."),True)
+        if not _DEBUGSTRING is None:
+            return True
+        try:
+            actual_kernel = os.uname()[2]
+            if hal.is_sim == 1 :
+                if fussy:
+                    self.warning_dialog(_("You are using a simulated-realtime version of LinuxCNC, so testing / tuning of external hardware is unavailable."),True)
+                    return False
+                else:
+                    return True
+            elif hal.is_rt and not hal.kernel_version == actual_kernel:
+                self.warning_dialog(_("""You are using a realtime version of LinuxCNC but didn't load a realtime kernel so testing / tuning of external  hardware is unavailable.\n This is probably because you updated the OS and it doesn't load the RTAI kernel anymore\n You are using the %(actual)s kernel instead of %(needed)s""")% {'actual':actual_kernel, 'needed':hal.kernel_version},True)
                 return False
             else:
                 return True
-        elif hal.is_rt and not hal.kernel_version == actual_kernel:
-            self.warning_dialog(_("""You are using a realtime version of LinuxCNC but didn't load a realtime kernel so testing / tuning of external  hardware is unavailable.\n This is probably because you updated the OS and it doesn't load the RTAI kernel anymore\n You are using the %(actual)s kernel instead of %(needed)s""")% {'actual':actual_kernel, 'needed':hal.kernel_version},True)
-            return False
-        else:
+        except:
             return True
-       
+
     def on_page_newormodify_prepare(self, *args):
         global mesaboardnames
         global mesafirmwaredata
         self.data.help = "help-load.txt"
         # search for firmware packages
+        mesaboardnames = []
+        mesaboardnames.append('5i25-Internal Data')
         if os.path.exists(firmdir):
-            mesaboardnames = []
             for root, dirs, files in os.walk(firmdir):
                 folder = root.lstrip(firmdir)
                 if folder in mesablacklist:continue
                 if folder == "":continue
                 mesaboardnames.append(folder)
                 #print "\n**** ",folder,":\n"
-        else:
-            #TODO what if there are no external firmware is this enough?
-            self.warning_dialog(_("You are have no hostmot2 firmware downloaded in folder:\n%s\n\
-PNCconf will use sample firmware data\nlive testing will not be possible"%firmdir),True)
 
         # add any extra firmware boardnames from .pncconf-preference file 
         if not custommesafirmwaredata == []:
@@ -4515,6 +4438,11 @@ PNCconf will use sample firmware data\nlive testing will not be possible"%firmdi
             if not custommesafirmwaredata == []:
                 for i,j in enumerate(custommesafirmwaredata):
                     mesafirmwaredata.append(custommesafirmwaredata[i])
+            # add internal sample firmware
+            global mesafirmwaredata_internal
+            for i in mesafirmwaredata_internal:
+                mesafirmwaredata.append(i)
+            print 'internal added'
             # ok set up mesa info
             for boardnum in (0,1):
                 model = self.widgets["mesa%d_firmware"% boardnum].get_model()
@@ -4659,6 +4587,7 @@ Ok to reset data and start a new configuration?"),False):
             pinconvertnone = {"NOT USED":NUSED}
             count = 0
             for i,j in enumerate(pins):
+                instance_num = 9999
                 temppinunit = []
                 temp = pins[i].find("connector").text
                 tempcon = int(temp.strip("P"))
@@ -5270,6 +5199,7 @@ Clicking 'existing custom program' will aviod this warning. "),False):
         self.do_exclusive_inputs(15)
 
     def on_mesa_boardname_changed(self, widget,boardnum):
+        return
         #print "**** INFO boardname changed"
         model = self.widgets["mesa%d_boardtitle"% boardnum].get_model()
         active = self.widgets["mesa%d_boardtitle"% boardnum].get_active()
@@ -6267,7 +6197,7 @@ I hesitate to even allow it's use but at times it's very useful.\nDo you wish to
                             else:
                                 self.widgets[complabel].set_text("%02d:"%(concount*24+pin-24)) #sserial output
                     elif '5i25' in currentboard:
-                         self.widgets[complabel].set_text("%03d:"%(concount*16+pin))# 5i25 mainboard GPIO
+                         self.widgets[complabel].set_text("%03d:"%(concount*17+pin))# 5i25 mainboard GPIO
                     else:
                          self.widgets[complabel].set_text("%03d:"%(concount*24+pin))# mainboard GPIO
                     if compnum == 100 and widgettext == firmptype:
@@ -6394,6 +6324,7 @@ I hesitate to even allow it's use but at times it's very useful.\nDo you wish to
                         signalindex = 0
                     #print "ENC ->dataptype:",self.data[ptype]," dataptype:",self.data[p],signalindex
                     count = -3
+                    temp = (0) # set unused encoder if no match
                     if signalindex > 0:
                         for row,parent in enumerate(human_encoder_input_names):
                             if len(parent[1]) == 0:continue
@@ -6405,8 +6336,6 @@ I hesitate to even allow it's use but at times it's very useful.\nDo you wish to
                                     break
                             if count >= signalindex:break
                         temp = (row,column)
-                    else:
-                        temp = (0) # set unused encoder if no match
                     #print temp
                     if widgetptype == ENCA:
                         treeiter = self.data._encodersignaltree.get_iter(temp)
@@ -6423,6 +6352,7 @@ I hesitate to even allow it's use but at times it's very useful.\nDo you wish to
                         signalindex = 0
                     #print "dataptype:",self.data[ptype]," dataptype:",self.data[p],signalindex
                     count = 0
+                    temp = (0) # set unused resolver
                     if signalindex > 0:
                         for row,parent in enumerate(human_resolver_input_names):
                             if row == 0: continue
@@ -6442,8 +6372,6 @@ I hesitate to even allow it's use but at times it's very useful.\nDo you wish to
                                     temp = (row,column)
                                     break
                             if count >= signalindex:break
-                    else:
-                        temp = (0) # set unused resolver
                     #print "temp",temp
                     treeiter = self.data._resolversignaltree.get_iter(temp)
                     self.widgets[p].set_active_iter(treeiter)
@@ -6457,6 +6385,7 @@ I hesitate to even allow it's use but at times it's very useful.\nDo you wish to
                         signalindex = 0
                     #print "dataptype:",self.data[ptype]," dataptype:",self.data[p],signalindex
                     count = 0
+                    temp = (0) # set unused 8i20 amp
                     if signalindex > 0:
                         for row,parent in enumerate(human_8i20_input_names):
                             if row == 0: continue
@@ -6476,8 +6405,6 @@ I hesitate to even allow it's use but at times it's very useful.\nDo you wish to
                                     temp = (row,column)
                                     break
                             if count >= signalindex:break
-                    else:
-                        temp = (0) # set unused 8i20 amp
                     #print "temp",temp
                     treeiter = self.data._8i20signaltree.get_iter(temp)
                     self.widgets[p].set_active_iter(treeiter)
@@ -6492,6 +6419,7 @@ I hesitate to even allow it's use but at times it's very useful.\nDo you wish to
                         signalindex = 0
                     #print "dataptype:",self.data[ptype]," dataptype:",self.data[p],signalindex
                     count = -1
+                    temp = (0) # set unused potentiometer
                     if signalindex > 0:
                         for row,parent in enumerate(human_pot_output_names):
                             if row == 0: continue
@@ -6511,8 +6439,6 @@ I hesitate to even allow it's use but at times it's very useful.\nDo you wish to
                                     temp = (row,column)
                                     break
                             if count >= signalindex:break
-                    else:
-                        temp = (0) # set unused potentiometer
                     #print "temp",temp
                     treeiter = self.data._potsignaltree.get_iter(temp)
                     self.widgets[p].set_active_iter(treeiter)
@@ -6526,6 +6452,7 @@ I hesitate to even allow it's use but at times it's very useful.\nDo you wish to
                         signalindex = 0
                     #print "dataptype:",self.data[ptype]," dataptype:",self.data[p],signalindex
                     count = 0
+                    temp = (0) # set unused
                     if signalindex > 0:
                         for row,parent in enumerate(human_analog_input_names):
                             if row == 0: continue
@@ -6545,8 +6472,6 @@ I hesitate to even allow it's use but at times it's very useful.\nDo you wish to
                                     temp = (row,column)
                                     break
                             if count >= signalindex:break
-                    else:
-                        temp = (0) # set unused 8i20 amp
                     #print "temp",temp
                     treeiter = self.data._analoginsignaltree.get_iter(temp)
                     self.widgets[p].set_active_iter(treeiter)
@@ -6574,6 +6499,7 @@ I hesitate to even allow it's use but at times it's very useful.\nDo you wish to
                         signalindex = 0
                     #print "dataptype:",self.data[ptype]," dataptype:",self.data[p],signalindex
                     count = -2
+                    temp = (0) # set unused pwm
                     if signalindex > 0:
                         #print "\n parsing PWM names"
                         for row,parent in enumerate(human_pwm_output_names):
@@ -6595,8 +6521,6 @@ I hesitate to even allow it's use but at times it's very useful.\nDo you wish to
                                     temp = (row,column)
                                     break
                             if count >= signalindex:break
-                    else:
-                        temp = (0) # set unused pwm
                     #print "temp",temp
                     treeiter = self.data._pwmsignaltree.get_iter(temp)
                     self.widgets[p].set_active_iter(treeiter)
@@ -6605,6 +6529,7 @@ I hesitate to even allow it's use but at times it's very useful.\nDo you wish to
                 elif widgetptype == TPPWMA:
                     #print "3 pwm"
                     count = -7
+                    temp = (0) # set unused stepper
                     try:
                         signalindex = hal_tppwm_output_names.index(datap)
                     except:
@@ -6630,8 +6555,6 @@ I hesitate to even allow it's use but at times it's very useful.\nDo you wish to
                                temp = (row,column)
                                break
                            if count >= signalindex:break
-                    else:
-                        temp = (0) # set unused stepper
                     treeiter = self.data._tppwmsignaltree.get_iter(temp)
                     self.widgets[p].set_active_iter(treeiter)
 
@@ -6647,6 +6570,7 @@ I hesitate to even allow it's use but at times it's very useful.\nDo you wish to
                         if debug: print "**** INFO: PNCCONF warning no STEPPER signal named: %s\n     found for pin %s"% (datap ,p)
                         signalindex = 0
                     count = -5
+                    temp = (0) # set unused stepper
                     #print "stepper,dataptype:",self.data[ptype]," dataptype:",self.data[p],signalindex
                     if signalindex > 0:
                        for row,parent in enumerate(human_stepper_names):
@@ -6667,8 +6591,6 @@ I hesitate to even allow it's use but at times it's very useful.\nDo you wish to
                                temp = (row,column)
                                break
                            if count >= signalindex:break
-                    else:
-                        temp = (0) # set unused stepper
                     treeiter = self.data._steppersignaltree.get_iter(temp)
                     self.widgets[p].set_active_iter(treeiter)
 
@@ -6683,6 +6605,7 @@ I hesitate to even allow it's use but at times it's very useful.\nDo you wish to
                         if debug: print "**** INFO: PNCCONF warning no SMART SERIAL signal named: %s\n     found for pin %s"% (datap ,p)
                         signalindex = 0
                     count = -2
+                    temp = (0) # set unused sserial
                     #print "sserial,dataptype:",self.data[ptype]," dataptype:",self.data[p],signalindex
                     if signalindex > 0:
                        for row,parent in enumerate(human_sserial_names):
@@ -6695,8 +6618,6 @@ I hesitate to even allow it's use but at times it's very useful.\nDo you wish to
                                 temp = (row)
                                 break
                              continue
-                    else:
-                        temp = (0) # set unused sserial
                     treeiter = self.data._sserialsignaltree.get_iter(temp)
                     self.widgets[p].set_active_iter(treeiter)
 
@@ -8169,6 +8090,8 @@ I hesitate to even allow it's use but at times it's very useful.\nDo you wish to
         self.widgets.s32out.set_value(self.data.s32out)
         self.widgets.floatsin.set_value(self.data.floatsin)
         self.widgets.floatsout.set_value(self.data.floatsout)
+        self.widgets.bitmem.set_value(self.data.bitmem)
+        self.widgets.wordmem.set_value(self.data.wordmem)
         self.widgets.halui.set_active(self.data.halui)
         self.widgets.ladderexist.set_active(self.data.ladderexist)
         self.widgets.laddertouchz.set_active(self.data.laddertouchz)
@@ -8186,6 +8109,8 @@ I hesitate to even allow it's use but at times it's very useful.\nDo you wish to
         self.data.s32in = self.widgets.s32in.get_value()
         self.data.s32out = self.widgets.s32out.get_value()
         self.data.floatsin = self.widgets.floatsin.get_value()
+        self.data.bitmem = self.widgets.bitmem.get_value()
+        self.data.wordmem = self.widgets.wordmem.get_value()
         self.data.floatsout = self.widgets.floatsout.get_value()
         self.data.halui = self.widgets.halui.get_active()
         self.data.ladderexist = self.widgets.ladderexist.get_active()
@@ -8262,6 +8187,8 @@ different program to copy to your configuration file.\nThe edited program will b
         self.widgets.s32out.set_sensitive(i)
         self.widgets.floatsin.set_sensitive(i)
         self.widgets.floatsout.set_sensitive(i)
+        self.widgets.bitmem.set_sensitive(i)
+        self.widgets.wordmem.set_sensitive(i)
         self.widgets.modbus.set_sensitive(i)
         self.widgets.ladderblank.set_sensitive(i)
         self.widgets.ladder1.set_sensitive(i)
@@ -8278,6 +8205,8 @@ different program to copy to your configuration file.\nThe edited program will b
         self.widgets.label_s32out.set_sensitive(i)
         self.widgets.label_floatin.set_sensitive(i)
         self.widgets.label_floatout.set_sensitive(i)
+        self.widgets.label_bitmem.set_sensitive(i)
+        self.widgets.label_wordmem.set_sensitive(i)
         self.widgets.ladderconnect.set_sensitive(i)
         if self.widgets.laddertouchz.get_active():
             i = self.data.gladevcphaluicmds
@@ -8843,7 +8772,7 @@ But there is not one in the machine-named folder.."""),True)
         halrun.write(""" 
               loadrt threads period1=%(period)d name1=fast fp1=0 period2=%(period2)d name2=slow 
               loadrt classicladder_rt numPhysInputs=%(din)d numPhysOutputs=%(dout)d numS32in=%(sin)d\
-               numS32out=%(sout)d numFloatIn=%(fin)d numFloatOut=%(fout)d
+               numS32out=%(sout)d numFloatIn=%(fin)d numFloatOut=%(fout)d numBits=%(bmem)d numWords=%(wmem)d
                addf classicladder.0.refresh slow
                start\n""" % {
                       'din': self.widgets.digitsin.get_value(),
@@ -8852,6 +8781,8 @@ But there is not one in the machine-named folder.."""),True)
                       'sout': self.widgets.s32out.get_value(), 
                       'fin':self.widgets.floatsin.get_value(),
                       'fout':self.widgets.floatsout.get_value(),
+                      'bmem':self.widgets.bitmem.get_value(),
+                      'wmem':self.widgets.wordmem.get_value(),
                       'period':100000, 
                       'period2':self.data.servoperiod
                  })
@@ -8976,6 +8907,7 @@ But there is not one in the machine-named folder.."""),True)
         pwmmaxoutput = get_value(w[axis+"outputscale"])
              
         self.halrun = halrun = os.popen("halrun -I > /dev/null", "w")
+
         halrun.write("""
         loadrt threads period1=%(period)d name1=fast fp1=0 period2=%(period2)d name2=slow
         loadusr halscope
@@ -9279,7 +9211,9 @@ But there is not one in the machine-named folder.."""),True)
         enc_scale = get_value(widgets[axis+"encoderscale"])
         pump = self.data.findsignal("charge-pump")
 
-        halrun.write("loadrt threads period1=%d name1=fast fp1=0 period2=%d name2=slow \n" % (100000, self.data.servoperiod  ))       
+        halrun.write("loadrt threads period1=%d name1=fast fp1=0 period2=%d name2=slow \n" % (100000, self.data.servoperiod  ))
+        if not _DEBUGSTRING is None:
+            halrun.write("echo\n")
         self.hal_cmnds("LOAD")
         #halrun.write("loadrt steptest\n")
         halrun.write("loadusr halscope\n")
@@ -9333,7 +9267,11 @@ But there is not one in the machine-named folder.."""),True)
 
             else: # sserial PWM
                 pwm_enable = self.data.make_pinname(pwm_sig,False,True) # get prefix only
-                halrun.write("net enable %s \n"%  (pwm_enable +"analogena"))
+                if 'analogout5' in self.pwm:
+                    enable ='spinena'
+                else:
+                    enable ='analogena'
+                halrun.write("net enable %s \n"%  (pwm_enable + enable))
                 halrun.write("setp   "+self.pwm+"-minlim   %.1f\n"% pwmminlimit)
                 halrun.write("setp   "+self.pwm+"-maxlim   %.1f\n"% pwmmaxlimit)
                 halrun.write("setp   "+self.pwm+"-scalemax %.1f\n"% pwmmaxoutput)
@@ -9460,12 +9398,7 @@ But there is not one in the machine-named folder.."""),True)
         self.widgets.jogplus.set_sensitive(self.enable_amp)
         self.update_axis_params()
 
-    def run(self, debug=None):
-        print "debug",debug
-        if debug is not None:
-            global _DEBUGSTRING
-            _DEBUGSTRING = debug.split(',')
-            print "debug",_DEBUGSTRING
+    def run(self):
         gtk.main()
 
     def hal_test_signals(self, axis):
@@ -9583,7 +9516,11 @@ But there is not one in the machine-named folder.."""),True)
             directory1 = self.data.mesa1_currentfirmwaredata[_DIRECTORY]
             firm0 = self.data.mesa0_currentfirmwaredata[_FIRMWARE]
             firm1 = self.data.mesa1_currentfirmwaredata[_FIRMWARE]
-            firmstring0 = firmstring1 = ""
+            firmstring0 = firmstring1 = mesa0_ioaddr = mesa1_ioaddr = ""
+            if '7i43' in board0:
+                mesa0_ioaddr = ' ioaddr=%s ioaddr_hi=0 epp_wide=1'% self.data.mesa0_parportaddrs
+            if '7i43' in board1:
+                mesa1_ioaddr = ' ioaddr=%s ioaddr_hi=0 epp_wide=1'% self.data.mesa1_parportaddrs
             if not "5i25" in board0:
                 firmstring0 = "firmware=hm2/%s/%s.BIT" % (directory0, firm0)
             if not "5i25" in board1:
@@ -9605,7 +9542,7 @@ But there is not one in the machine-named folder.."""),True)
                 for i in range(1,9):
                     if i <= self.data.mesa1_numof_sserialchannels:
                         # if m1 in the name then it needs mode 1
-                        if "m1" in self.data["mesa1sserial1_%dsubboard"% (i-1)]:
+                        if "m1" in self.data["mesa1sserial0_%dsubboard"% (i-1)]:
                             temp = temp + "1"
                         else:
                             temp = temp + "0"
@@ -9618,19 +9555,23 @@ But there is not one in the machine-named folder.."""),True)
                 resolver1 = "num_resolvers=%d"% self.data.mesa1_numof_resolvers
 
             if self.data.number_mesa == 1:            
-                halrun.write( """loadrt %s config="%s num_encoders=%d num_pwmgens=%d num_3pwmgens=%d num_stepgens=%d %s %s"\n """ % (
-                    driver0, firmstring0, self.data.mesa0_numof_encodergens, self.data.mesa0_numof_pwmgens, self.data.mesa0_numof_tppwmgens, self.data.mesa0_numof_stepgens, ssconfig0, resolver0))
+                halrun.write( """loadrt %s%s config="%s num_encoders=%d num_pwmgens=%d num_3pwmgens=%d num_stepgens=%d %s %s"\n """ % (
+                    driver0, mesa0_ioaddr, firmstring0, self.data.mesa0_numof_encodergens, self.data.mesa0_numof_pwmgens,
+                    self.data.mesa0_numof_tppwmgens, self.data.mesa0_numof_stepgens, ssconfig0, resolver0))
             elif self.data.number_mesa == 2 and (driver0 == driver1):
-                halrun.write( """loadrt %s config="%s num_encoders=%d num_pwmgens=%d num_3pwmgens=%d num_stepgens=%d %s %s,\
-                                %s num_encoders=%d num_pwmgens=%d num_3pwmgens=%d num_stepgens=%d %s %s"\n""" % (
-                    driver0, firmstring0, self.data.mesa0_numof_encodergens, self.data.mesa0_numof_pwmgens, self.data.mesa0_numof_tppwmgens,
-                        self.data.mesa0_numof_stepgens, ssconfig0, resolver0, firmstring1, self.data.mesa1_numof_encodergens,
- self.data.mesa1_numof_pwmgens, self.data.mesa1_numof_tppwmgens,self.data.mesa1_numof_stepgens, ssconfig1, resolver1))
+                halrun.write( """loadrt %s%s config="%s num_encoders=%d num_pwmgens=%d num_3pwmgens=%d num_stepgens=%d %s %s,\
+                                %s%s num_encoders=%d num_pwmgens=%d num_3pwmgens=%d num_stepgens=%d %s %s"\n""" % (
+                    driver0, mesa0_ioaddr, firmstring0, self.data.mesa0_numof_encodergens, self.data.mesa0_numof_pwmgens,
+                    self.data.mesa0_numof_tppwmgens,self.data.mesa0_numof_stepgens, ssconfig0, resolver0, mesa1_ioaddr, firmstring1,
+                    self.data.mesa1_numof_encodergens, self.data.mesa1_numof_pwmgens, self.data.mesa1_numof_tppwmgens,
+                    self.data.mesa1_numof_stepgens, ssconfig1, resolver1))
             elif self.data.number_mesa == 2:
-                halrun.write( """loadrt %s config="%s num_encoders=%d num_pwmgens=%d num_3pwmgens=%d num_stepgens=%d" %s %s\n """ % (
-                    driver0, firmstring0, self.data.mesa0_numof_encodergens, self.data.mesa0_numof_pwmgens, self.data.mesa0_numof_tppwmgens, self.data.mesa0_numof_stepgens, ssconfig0, resolver0 ))
-                halrun.write( """loadrt %s config="%s num_encoders=%d num_pwmgens=%d num_3pwmgens=%d num_stepgens=%d %s %s"\n """ % (
-                    driver1, firmstring1, self.data.mesa1_numof_encodergens, self.data.mesa1_numof_pwmgens, self.data.mesa0_numof_tppwmgens, self.data.mesa1_numof_stepgens, ssconfig1, resolver1 ))
+                halrun.write( """loadrt %s%s config="%s num_encoders=%d num_pwmgens=%d num_3pwmgens=%d num_stepgens=%d" %s %s\n """ % (
+                    driver0, mesa0_ioaddr, firmstring0, self.data.mesa0_numof_encodergens, self.data.mesa0_numof_pwmgens,
+                    self.data.mesa0_numof_tppwmgens, self.data.mesa0_numof_stepgens, ssconfig0, resolver0 ))
+                halrun.write( """loadrt %s%s config="%s num_encoders=%d num_pwmgens=%d num_3pwmgens=%d num_stepgens=%d %s %s"\n """ % (
+                    driver1, mesa1_ioaddr, firmstring1, self.data.mesa1_numof_encodergens, self.data.mesa1_numof_pwmgens,
+                    self.data.mesa0_numof_tppwmgens, self.data.mesa1_numof_stepgens, ssconfig1, resolver1 ))
             for boardnum in range(0,int(self.data.number_mesa)):
                 if boardnum == 1 and (board0 == board1):
                     halnum = 1
@@ -10070,6 +10011,9 @@ if mode:
     data = Data()
     data.load(filename, None, force)
     data.save()
+if debugswitch:
+    app = App(1)
+    app.run()
 elif args:
     app = App()
     app.run(args[0])
