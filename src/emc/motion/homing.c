@@ -600,11 +600,7 @@ void do_homing(void)
 		   switch position as accurately as possible.  It sets the
 		   current joint position to 'home_offset', which is the
 		   location of the home switch in joint coordinates. */
-<<<<<<< HEAD
         if (joint->home_pause_timer < (0.5 * servo_freq)) {
-=======
-        if (joint->home_pause_timer < (0.8 * servo_freq)) {
->>>>>>> add-hal-ethercat
 		    /* no, update timer and wait some more */
 		    joint->home_pause_timer++;
 		    break;
@@ -613,17 +609,10 @@ void do_homing(void)
 		/* set the current position to 'home_offset' */
 		/* this moves the internal position but does not affect the
 		   motor position */
-<<<<<<< HEAD
+	        joint->motor_offset -= (joint->home_offset - joint->pos_fb);
 		joint->pos_cmd = joint->home_offset;
 		joint->pos_fb = joint->home_offset;
 		joint->free_pos_cmd = joint->home_offset;
-		joint->motor_offset = -joint->home_offset;
-=======
-        joint->motor_offset -= (joint->home_offset - joint->pos_fb);
-		joint->pos_cmd = joint->home_offset;
-		joint->pos_fb = joint->home_offset;
-		joint->free_pos_cmd = joint->home_offset;
->>>>>>> add-hal-ethercat
 		/* next state */
 		joint->home_state = HOME_LOCK;
 		immediate_state = 1;
