@@ -1761,7 +1761,7 @@ static void output_to_hal(void)
     *(emcmot_hal_data->coord_error) = GET_MOTION_ERROR_FLAG();
     *(emcmot_hal_data->on_soft_limit) = emcmotStatus->on_soft_limit;
     if(emcmotStatus->spindle.css_factor) {
-	double denom = fabs(emcmotStatus->spindle.xoffset - emcmotStatus->carte_pos_cmd.tran.x);
+	double denom = fabs(emcmotStatus->spindle.xoffset - emcmotStatus->carte_pos_cmd.tran.z);
 	double speed;
         double maxpositive;
         if(denom > 0) speed = emcmotStatus->spindle.css_factor / denom;
