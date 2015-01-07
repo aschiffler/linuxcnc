@@ -1,0 +1,30 @@
+loadusr -W lcec_conf /root/linuxcnc/configs/warren/basic_3_estun.xml
+loadrt lcec
+loadrt trivkins
+loadrt [EMCMOT]EMCMOT base_period_nsec=[EMCMOT]BASE_PERIOD servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[TRAJ]AXES
+
+addf lcec.read-all servo-thread
+addf motion-command-handler servo-thread
+addf motion-controller servo-thread
+addf lcec.write-all servo-thread
+
+net ec_up lcec.state-op => iocontrol.0.emc-enable-in => lcec.0.0.drivecontrol-0 => lcec.0.1.drivecontrol-0 => lcec.0.2.drivecontrol-0
+
+ 
+setp lcec.0.0.drivecontrol-1 1
+setp lcec.0.0.drivecontrol-2 1
+setp lcec.0.1.drivecontrol-1 1
+setp lcec.0.1.drivecontrol-2 1
+setp lcec.0.2.drivecontrol-1 1
+setp lcec.0.2.drivecontrol-2 1
+
+net Xachse_AF axis.0.amp-enable-out => lcec.0.0.drivecontrol-3 
+net Yachse_AF axis.1.amp-enable-out => lcec.0.1.drivecontrol-3 
+net Zachse_AF axis.2.amp-enable-out => lcec.0.2.drivecontrol-3 
+
+net Xachse_fb lcec.0.0.pos => axis.0.motor-pos-fb
+net Xachse_cmd axis.0.motor-pos-cmd => lcec.0.0.poscommand
+net Yachse_fb lcec.0.1.pos => axis.1.motor-pos-fb
+net Yachse_cmd axis.1.motor-pos-cmd => lcec.0.1.poscommand
+net Zachse_fb lcec.0.2.pos => axis.2.motor-pos-fb
+net Zachse_cmd axis.2.motor-pos-cmd => lcec.0.2.poscommand
