@@ -284,17 +284,17 @@ void do_homing(void)
 			joint->home_state = HOME_SET_SWITCH_POSITION;
 			immediate_state = 1;
 			} else if (joint->home_latch_vel == 9.9) {
-            /* joint moves via external control*/
-			    joint->home_state = HOME_INITIAL_SEARCH_WAIT;
-			    immediate_state = 1;
-            } else if (joint->home_latch_vel == 6.6) {
-            /* joint did not need to be homed --> absolut position feedback*/
-                joint->home_state = HOME_LOCK;
-                immediate_state = 1;
-		    } else if (joint->home_flags & HOME_USE_INDEX) {
+            		/* joint moves via external control*/
+			    	joint->home_state = HOME_INITIAL_SEARCH_WAIT;
+			    	immediate_state = 1;
+            		} else if (joint->home_latch_vel == 6.6) {
+			/* joint did not need to be homed --> absolut position feedback*/
+                		joint->home_state = HOME_LOCK;
+                		immediate_state = 1;
+		    	} else if (joint->home_flags & HOME_USE_INDEX) {
 			/* home using index pulse only */
-			joint->home_state = HOME_INDEX_ONLY_START;
-			immediate_state = 1;
+				joint->home_state = HOME_INDEX_ONLY_START;
+				immediate_state = 1;
 		    } else {
 			reportError(_("invalid homing config: non-zero LATCH_VEL needs either SEARCH_VEL or USE_INDEX"));
 			joint->home_state = HOME_IDLE;
@@ -377,7 +377,7 @@ void do_homing(void)
 		    break;
 		}
 		/* set up a move at 'search_vel' to find switch */
-		// home_start_move(joint, joint->home_search_vel);
+		home_start_move(joint, joint->home_search_vel);
 		/* next state */
 		joint->home_state = HOME_INITIAL_SEARCH_WAIT;
 		break;
@@ -392,8 +392,10 @@ void do_homing(void)
 		    /* yes, stop motion */
 		    joint->free_tp_enable = 0;
 		    /* go to next step */
-		    //joint->home_state = HOME_SET_COARSE_POSITION;
-		    joint->home_state = HOME_SET_SWITCH_POSITION;
+		    joint->home_state = HOME_SET_COARSE_POSITION;
+		    if (joint->home_latch_vel == 9.9) {			    
+			joint->home_state = HOME_SET_SWITCH_POSITION;
+		    }
 		    joint->home_pause_timer=0;
 		    immediate_state = 0;
 		    break;
