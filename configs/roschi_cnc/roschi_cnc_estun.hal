@@ -1,0 +1,30 @@
+# Erstellt von stepconf am Tue Jul 16 23:06:39 2013
+# Änderungen an dieser Datei werden beim nächsten
+# Aufruf von stepconf überschrieben.
+loadusr -W lcec_conf /root/linuxcnc/configs/roschi_cnc/ethercat_config_estun.xml
+loadrt lcec
+loadrt trivkins
+loadrt [EMCMOT]EMCMOT base_period_nsec=[EMCMOT]BASE_PERIOD servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[TRAJ]AXES
+loadrt classicladder_rt
+loadusr classicladder --nogui custom.clp
+
+
+addf lcec.read-all servo-thread
+addf motion-command-handler servo-thread
+addf motion-controller servo-thread
+addf lcec.write-all servo-thread
+addf classicladder.0.refresh servo-thread
+
+
+setp lcec.0.0.drivecontrol-1 1
+setp lcec.0.0.drivecontrol-2 1
+
+
+net Xachse_fb lcec.0.0.pos => axis.0.motor-pos-fb
+net Xachse_cmd axis.0.motor-pos-cmd => lcec.0.0.poscommand
+net Xachse_speed_cmd axis.0.joint-vel-cmd => lcec.0.0.speedcommand
+
+
+
+net Xachse_AF axis.0.amp-enable-out => lcec.0.0.drivecontrol-3 
+net Xachse_torque lcec.0.0.torque

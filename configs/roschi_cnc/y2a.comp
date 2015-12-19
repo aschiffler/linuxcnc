@@ -1,0 +1,16 @@
+component y2a "y2a";
+pin in float in1;
+pin in float in2;
+pin in float diameter=114.591559025;
+pin out float out1_;
+pin out float out2_;
+
+function _;
+
+license "GPL";
+;;
+#include <rtapi_math.h>
+FUNCTION(_) {
+	out1_ = in1/360.0 * diameter *3.14159265359;
+	out2_ = in2*360.0 / diameter / 3.14159265359;
+}

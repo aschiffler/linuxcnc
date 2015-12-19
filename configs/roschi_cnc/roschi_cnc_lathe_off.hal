@@ -1,0 +1,107 @@
+loadusr -W lcec_conf /home/roschi/linuxcnc/configs/ethercat_config.xml
+loadrt lcec
+loadrt maxkins
+loadrt [EMCMOT]EMCMOT servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[TRAJ]AXES
+loadrt classicladder_rt
+loadrt encoder names=encoder
+loadrt not
+loadusr classicladder --nogui custom.clp
+
+
+addf lcec.read-all servo-thread
+addf encoder.capture-position servo-thread
+addf motion-command-handler servo-thread
+addf motion-controller servo-thread
+addf lcec.write-all servo-thread
+addf classicladder.0.refresh servo-thread
+addf not.0 servo-thread
+
+setp maxkins.enable 0.0
+setp maxkins.a_axes_y_shift 89.0
+setp maxkins.a_axes_z_shift 46.0
+
+
+setp lcec.0.3.drivecontrol-8 1
+setp lcec.0.3.drivecontrol-13 1
+setp lcec.0.3.drivecontrol-14 1
+setp lcec.0.3.signalcontrol-0 0
+
+setp lcec.0.4.drivecontrol-8 1
+setp lcec.0.4.drivecontrol-13 1
+setp lcec.0.4.drivecontrol-14 1
+setp lcec.0.4.signalcontrol-0 0
+
+setp lcec.0.5.drivecontrol-8 1
+setp lcec.0.5.drivecontrol-13 1
+setp lcec.0.5.drivecontrol-14 1
+setp lcec.0.5.signalcontrol-0 0
+
+setp lcec.0.6.drivecontrol-1 1
+setp lcec.0.6.drivecontrol-2 1
+
+
+net Xachse_fb lcec.0.3.pos => joint.0.motor-pos-fb
+net Xachse_cmd joint.0.motor-pos-cmd => lcec.0.3.poscommand
+net Xachse_speed_cmd joint.0.vel-cmd => lcec.0.3.speedaddcommand
+
+net Xachse_homing_cmd joint.0.homing => lcec.0.3.signalcontrol-0
+net Xachse_homing_fb lcec.0.3.signalstatus-0 => joint.0.home-sw-in
+
+net Xachse_AF joint.0.amp-enable-out => lcec.0.3.drivecontrol-15
+net Xachse_Fault lcec.0.3.drivestatus-13 => joint.0.amp-fault-in
+net Xachse_torque lcec.0.3.torque
+
+net Yachse_fb lcec.0.4.pos => joint.1.motor-pos-fb
+net Yachse_cmd joint.1.motor-pos-cmd => lcec.0.4.poscommand
+net Yachse_speed_cmd joint.1.vel-cmd => lcec.0.4.speedaddcommand
+
+net Yachse_homing_cmd joint.1.homing => lcec.0.4.signalcontrol-0
+net Yachse_homing_fb lcec.0.4.signalstatus-0 => joint.1.home-sw-in
+
+net Yachse_AF joint.1.amp-enable-out => lcec.0.4.drivecontrol-15
+net Yachse_Fault lcec.0.4.drivestatus-13 => joint.1.amp-fault-in
+net Yachse_torque lcec.0.4.torque
+
+net Zachse_fb lcec.0.5.pos => joint.2.motor-pos-fb
+net Zachse_cmd joint.2.motor-pos-cmd => lcec.0.5.poscommand
+net Zachse_speed_cmd joint.2.vel-cmd => lcec.0.5.speedaddcommand
+
+net Zachse_homing_cmd joint.2.homing => lcec.0.5.signalcontrol-0
+net Zachse_homing_fb lcec.0.5.signalstatus-0 => joint.2.home-sw-in
+
+net Zachse_AF joint.2.amp-enable-out => lcec.0.5.drivecontrol-15
+net Zachse_Fault lcec.0.5.drivestatus-13 => joint.2.amp-fault-in
+net Zachse_torque lcec.0.5.torque
+
+net Aachse_AF joint.3.amp-enable-out => lcec.0.6.drivecontrol-3
+net Aachse_cmd joint.3.motor-pos-cmd => lcec.0.6.poscommand
+net Aachse_fb lcec.0.6.pos => joint.3.motor-pos-fb
+#net Aachse_speed_cmd joint.3.joint-vel-cmd => lcec.0.6.speedcommand
+net Aachse_torque lcec.0.6.torque
+
+
+net AI_X lcec.0.3.analogin  => motion.adaptive-feed
+net AI_Y lcec.0.4.analogin 
+#net AI_Z lcec.0.5.analogin
+
+# 4th joint (ESTUN)
+# OP Mode
+# Default to Axis mode (A axis)
+setp not.0.in 1
+net opmode_A_spindle not.0.out => lcec.0.6.opmode-0 => lcec.0.6.opmode-1
+setp lcec.0.6.opmode-2 0
+setp lcec.0.6.opmode-3 1
+
+# Lathe main spindle
+net Spindle_enable motion.spindle-on
+net Spindle_dir motion.spindle-reverse
+
+setp encoder.position-scale 360
+
+net Aachse_fb lcec.0.6.pos => encoder.external_angle
+net spindle_rev_fb encoder.position-interpolated => motion.spindle-revs
+net spindle_speed motion.spindle-speed-out => lcec.0.6.spindle_speed
+net spindle_speed_fb lcec.0.6.speed => motion.spindle-speed-in
+net spindle-index-enable motion.spindle-index-enable <=> encoder.index-enable
+
+

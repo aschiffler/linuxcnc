@@ -44,7 +44,7 @@
 <label><text>""</text></label>
 <checkbutton><halpin>"break_z_axis"</halpin><text>"Open Break Z-Axis"</text></checkbutton>
 <checkbutton><halpin>"main_spindle"</halpin><text>"Main spindle on/off"</text></checkbutton>
-<checkbutton><initval>0</initval><halpin>"a_axis_installed"</halpin><text>"A Axis installed"</text></checkbutton>
+<checkbutton><initval>1</initval><halpin>"a_axis_installed"</halpin><text>"A Axis installed"</text></checkbutton>
 <label><text>""</text></label>
 <vbox>
  <relief>RIDGE</relief>

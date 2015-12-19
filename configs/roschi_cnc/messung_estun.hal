@@ -1,0 +1,14 @@
+loadusr -W lcec_conf /home/roschi/linuxcnc/configs/messung_estun.xml
+loadrt lcec
+loadrt trivkins
+loadrt [EMCMOT]EMCMOT base_period_nsec=[EMCMOT]BASE_PERIOD servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[TRAJ]AXES
+
+
+addf lcec.read-all servo-thread
+addf motion-command-handler servo-thread
+addf motion-controller servo-thread
+addf lcec.write-all servo-thread
+
+
+net Xachse_fb lcec.0.0.pos => axis.0.motor-pos-fb
+

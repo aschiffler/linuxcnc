@@ -1,0 +1,60 @@
+# Torque Display
+net Xachse_torque pyvcp.xtorque_bar
+net Xachse_Fault lcec.0.3.drivestatus-13 => axis.0.amp-fault-in => pyvcp.x_state
+
+net Yachse_torque pyvcp.ytorque_bar
+#net Yachse_Fault lcec.0.4.drivestatus-13 => axis.1.amp-fault-in => pyvcp.y_state
+
+net Zachse_torque pyvcp.ztorque_bar
+net Zachse_Fault lcec.0.5.drivestatus-13 => axis.2.amp-fault-in => pyvcp.z_state
+
+net Aachse_torque pyvcp.atorque_bar
+
+
+# Analog Input Level Display
+net AI_X pyvcp.ai_x_bar
+net AI_Y pyvcp.ai_y_bar
+#net AI_Z pyvcp.ai_z_bar
+
+#net trafo_en maxkins.enable => pyvcp.trafo-led
+net rst_amps pyvcp.fault_rst_amps => lcec.0.6.drivecontrol-7 => lcec.0.5.signalcontrol-1 => lcec.0.4.signalcontrol-1 => lcec.0.3.signalcontrol-1
+net bus_count_in lcec.slaves-responding => pyvcp.bus_count_bar
+
+net break_open pyvcp.break_z_axis => lcec.0.2.dout-0
+net a_axis_ins pyvcp.a_axis_installed => and2.0.in0 => and2.1.in0
+
+
+net main_spindle_on pyvcp.main_spindle => classicladder.0.in-11 => classicladder.0.in-13
+
+# switch a axis to spindle mode and vise versa
+net unhome_a pyvcp.unhome_a => halui.joint.1.unhome
+net home_a pyvcp.home_a => halui.joint.1.home
+#net switch_opmode pyvcp.switch_opmode => lcec.0.6.opmode-3 => not.0.in
+
+
+
+# E-Chain PLC
+net ec_up lcec.state-op => classicladder.0.in-00 => pyvcp.bus_state
+net ext_estop lcec.0.1.din-1 => classicladder.0.in-01
+net emc-estop iocontrol.0.user-enable-out => classicladder.0.in-02
+net estop_out classicladder.0.out-00 => iocontrol.0.emc-enable-in => lcec.0.6.drivecontrol-0
+
+
+
+# Homing opmode switch for ESTUN Drive
+net in5 lcec.0.6.drivestatus-10 	=> classicladder.0.in-07 => motion.spindle-at-speed => pyvcp.a_at_speed
+net in6 lcec.0.6.drivestatus-3 		=> classicladder.0.in-10
+net in7 lcec.0.6.digital_inputs-0 	=> classicladder.0.in-08
+net in8 lcec.0.6.digital_inputs-1 	=> classicladder.0.in-09
+net Aachse_AF axis.1.amp-enable-out 	=> classicladder.0.in-12
+net in9 lcec.0.6.drivestatus-12 	=> classicladder.0.in-03
+net Spindle_enable 			=> classicladder.0.in-04
+
+net out6 classicladder.0.out-06 => and2.0.in1 => pyvcp.a_state
+net a_fault_route and2.0.out => axis.1.amp-fault-in  
+
+net out7 classicladder.0.out-07 => lcec.0.2.dout-2
+
+net Aachse_AF axis.1.amp-enable-out => classicladder.0.in-12
+net out8 classicladder.0.out-03 => halui.machine.off => message.0.trigger
+

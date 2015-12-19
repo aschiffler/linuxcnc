@@ -1,0 +1,12 @@
+loadrt trivkins
+loadrt [EMCMOT]EMCMOT base_period_nsec=[EMCMOT]BASE_PERIOD servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[TRAJ]AXES
+loadrt ownanalytics count=3
+
+addf motion-command-handler servo-thread
+addf motion-controller servo-thread
+
+setp iocontrol.0.emc-enable-in 1
+
+net Xachse_fb axis.0.motor-pos-cmd => axis.0.motor-pos-fb
+net Yachse_fb axis.1.motor-pos-cmd => axis.1.motor-pos-fb
+net Zachse_fb axis.2.motor-pos-cmd => axis.2.motor-pos-fb

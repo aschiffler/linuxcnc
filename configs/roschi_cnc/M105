@@ -1,0 +1,5 @@
+#!/bin/bash
+halcmd setp classicladder.0.in-14 0
+halcmd setp lcec.0.2.dout-3 0
+
+exit 0

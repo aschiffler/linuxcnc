@@ -1,0 +1,6 @@
+#!/bin/bash
+halcmd setp lcec.0.6.opmode-0 0
+halcmd setp lcec.0.6.opmode-1 0
+halcmd setp lcec.0.6.opmode-2 0
+halcmd setp lcec.0.6.opmode-3 0
+exit 0

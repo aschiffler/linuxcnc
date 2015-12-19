@@ -1,0 +1,4 @@
+#!/bin/bash
+halcmd sets trafo_en 1.0
+halcmd setp maxkins.a_axes_z_shift $1
+exit 0

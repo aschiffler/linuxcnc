@@ -1,0 +1,17 @@
+net Xachse_torque pyvcp.xtorque_bar
+net Yachse_torque pyvcp.ytorque_bar
+net Zachse_torque pyvcp.ztorque_bar
+
+net AI_X pyvcp.ai_x_bar
+net AI_Y pyvcp.ai_y_bar
+#net AI_Z pyvcp.ai_z_bar
+
+net break_open pyvcp.break_z_axis => lcec.0.2.dout-0
+
+net ec_up lcec.state-op => classicladder.0.in-00
+net ext_estop lcec.0.1.din-1 => classicladder.0.in-01
+net emc-estop iocontrol.0.user-enable-out => classicladder.0.in-02
+
+net estop_out classicladder.0.out-00 => iocontrol.0.emc-enable-in
+
+

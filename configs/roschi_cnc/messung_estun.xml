@@ -1,0 +1,28 @@
+<master idx="0" appTimePeriod="250000" refClockSyncCycles="5">
+  <slave idx="0" type="generic" vid="0000060A" pid="00000001" configPdos="true">
+    <sdoConfig idx="6060" subIdx="0">
+      <sdoDataRaw data="08"/>
+    </sdoConfig>
+    <syncManager idx="0" dir="out">
+    </syncManager>
+    <syncManager idx="1" dir="in">
+    </syncManager>
+    <syncManager idx="2" dir="out">
+      <pdo idx="1602">
+        <pdoEntry idx="6040" subIdx="00" bitLen="16" halPin="drivecontrol" halType="bit"/>
+        <pdoEntry idx="607A" subIdx="00" bitLen="32" halPin="poscommand" halType="special32" scale="1000"/>
+        <pdoEntry idx="60b1" subIdx="00" bitLen="32" halPin="speedcommand" halType="special32" scale="10"/>
+      </pdo>
+    </syncManager>
+    <syncManager idx="3" dir="in">
+      <pdo idx="1A02">
+        <pdoEntry idx="6041" subIdx="00" bitLen="16" halPin="drivestatus" halType="bit"/>
+        <pdoEntry idx="6064" subIdx="00" bitLen="32" halPin="pos" halType="special32" scale="1000"/>
+        <pdoEntry idx="6077" subIdx="00" bitLen="16" halPin="torque" halType="special32" scale="10"/>
+	<pdoEntry idx="606C" subIdx="00" bitLen="32" halPin="speed" halType="special32" scale="10"/>
+	<pdoEntry idx="60FD" subIdx="00" bitLen="32" halPin="digital_inputs" halType="bit"/>
+      </pdo>
+    </syncManager>
+    <dcConf assignActivate="300" sync0Cycle="*1" sync0Shift="250000"/>
+  </slave>
+</master>
