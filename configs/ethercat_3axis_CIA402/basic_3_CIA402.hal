@@ -1,4 +1,4 @@
-loadusr -W lcec_conf /root/linuxcnc/configs/warren/basic_3_estun.xml
+loadusr -W lcec_conf basic_3_CIA402.xml
 loadrt lcec
 loadrt trivkins
 loadrt [EMCMOT]EMCMOT base_period_nsec=[EMCMOT]BASE_PERIOD servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[TRAJ]AXES
