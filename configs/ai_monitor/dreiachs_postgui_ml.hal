@@ -1,0 +1,42 @@
+# Torque Display
+net Xachse_torque pyvcp.xtorque_bar
+net Xachse_torque ownanalytics.0.in
+net Xachse_speed lcec.0.3.speed => ownanalytics.4.in 
+net Xachse_Fault lcec.0.3.drivestatus-13 => axis.0.amp-fault-in => pyvcp.x_state
+
+net Yachse_torque pyvcp.ytorque_bar
+net Yachse_torque ownanalytics.1.in
+net Yachse_speed lcec.0.4.speed => ownanalytics.5.in 
+net Yachse_Fault lcec.0.4.drivestatus-13 => axis.1.amp-fault-in => pyvcp.y_state
+
+net Zachse_torque pyvcp.ztorque_bar
+net Zachse_torque ownanalytics.2.in
+net Zachse_speed lcec.0.5.speed => ownanalytics.6.in 
+net Zachse_Fault lcec.0.5.drivestatus-13 => axis.2.amp-fault-in => pyvcp.z_state
+
+net Spindle_torque pyvcp.atorque_bar
+net Spindle_torque ownanalytics.3.in
+net spindle_speed_fb ownanalytics.7.in 
+
+
+# Analog Input Level Display
+net AI_X pyvcp.ai_x_bar
+#net AI_Y pyvcp.ai_y_bar
+net spindle_speed_fb  pyvcp.spindle_rpm
+
+net rst_amps pyvcp.fault_rst_amps => lcec.0.6.drivecontrol-7 => lcec.0.5.signalcontrol-1 => lcec.0.4.signalcontrol-1 => lcec.0.3.signalcontrol-1
+
+net bus_count_in lcec.slaves-responding => pyvcp.bus_count_bar
+
+net break_open pyvcp.break_z_axis => lcec.0.2.dout-0
+
+
+# E-Chain PLC
+net ec_up lcec.state-op => classicladder.0.in-00 => pyvcp.bus_state
+net ext_estop lcec.0.1.din-1 => classicladder.0.in-01
+net emc-estop iocontrol.0.user-enable-out => classicladder.0.in-02
+net estop_out classicladder.0.out-00 => iocontrol.0.emc-enable-in => lcec.0.6.drivecontrol-0
+
+net Spindle_state lcec.0.6.drivestatus-10 => motion.spindle-at-speed => pyvcp.a_at_speed
+
+net a_fault_route lcec.0.6.drivestatus-3  => pyvcp.a_state

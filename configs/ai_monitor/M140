@@ -1,0 +1,3 @@
+#!/bin/bash
+halcmd setp ai_monitor.predict 0
+exit 0

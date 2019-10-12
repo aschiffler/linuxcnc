@@ -1,0 +1,36 @@
+net rt2log ai_monitor.logger_beat => ownanalytics.0.beat => ownanalytics.1.beat => ownanalytics.2.beat => ownanalytics.3.beat
+net rt2log ownanalytics.4.beat => ownanalytics.5.beat => ownanalytics.6.beat => ownanalytics.7.beat
+
+net rt2log_11 ownanalytics.0.avg => ai_monitor.logger_11
+net rt2log_12 ownanalytics.0.max => ai_monitor.logger_12
+net rt2log_13 ownanalytics.0.min => ai_monitor.logger_13
+
+net rt2log_21 ownanalytics.1.avg => ai_monitor.logger_21
+net rt2log_22 ownanalytics.1.max => ai_monitor.logger_22
+net rt2log_23 ownanalytics.1.min => ai_monitor.logger_23
+
+net rt2log_31 ownanalytics.2.avg => ai_monitor.logger_31
+net rt2log_32 ownanalytics.2.max => ai_monitor.logger_32
+net rt2log_33 ownanalytics.2.min => ai_monitor.logger_33
+
+net rt2log_41 ownanalytics.3.avg => ai_monitor.logger_41
+net rt2log_42 ownanalytics.3.max => ai_monitor.logger_42
+net rt2log_43 ownanalytics.3.min => ai_monitor.logger_43
+
+net rt2log_51 ownanalytics.4.avg => ai_monitor.logger_51
+net rt2log_52 ownanalytics.4.max => ai_monitor.logger_52
+net rt2log_53 ownanalytics.4.min => ai_monitor.logger_53
+
+net rt2log_61 ownanalytics.5.avg => ai_monitor.logger_61
+net rt2log_62 ownanalytics.5.max => ai_monitor.logger_62
+net rt2log_63 ownanalytics.5.min => ai_monitor.logger_63
+
+net rt2log_71 ownanalytics.6.avg => ai_monitor.logger_71
+net rt2log_72 ownanalytics.6.max => ai_monitor.logger_72
+net rt2log_73 ownanalytics.6.min => ai_monitor.logger_73
+
+net rt2log_81 ownanalytics.7.avg => ai_monitor.logger_81
+net rt2log_82 ownanalytics.7.max => ai_monitor.logger_82
+net rt2log_83 ownanalytics.7.min => ai_monitor.logger_83
+
+net ai2display ai_monitor.ai_label => pyvcp.ai_bar

@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<pyvcp>
+
+<vbox>
+<hbox>
+<led><halpin>"x_state"</halpin><size>20</size><on_color>"red"</on_color><off_color>"green"</off_color></led>
+<label><text>"X Torque [%]  "</text></label>
+</hbox>
+<bar><halpin>"xtorque_bar"</halpin><min_>-200</min_><max_>200</max_></bar>
+</vbox>
+
+<vbox>
+<hbox>
+<led><halpin>"y_state"</halpin><size>20</size><on_color>"red"</on_color><off_color>"green"</off_color></led>
+<label><text>"Y Torque [%]  "</text></label>
+</hbox>
+<bar><halpin>"ytorque_bar"</halpin><min_>-200</min_><max_>200</max_></bar>
+</vbox>
+
+<vbox>
+<hbox>
+<led><halpin>"z_state"</halpin><size>20</size><on_color>"red"</on_color><off_color>"green"</off_color></led>
+<label><text>"Z Torque [%]  "</text></label>
+</hbox>
+<bar><halpin>"ztorque_bar"</halpin><min_>-200</min_><max_>200</max_></bar>
+</vbox>
+
+<vbox>
+<hbox>
+<led><halpin>"a_state"</halpin><size>20</size><on_color>"red"</on_color><off_color>"green"</off_color></led>
+<label><text>"A Torque [%]  "</text></label>
+<led><halpin>"a_at_speed"</halpin><size>20</size><on_color>"green"</on_color><off_color>"red"</off_color></led>
+<label><text>"AT Speed  "</text></label>
+</hbox>
+<bar><halpin>"atorque_bar"</halpin><min_>-200</min_><max_>200</max_></bar>
+</vbox>
+
+
+
+<label><text>"Vorschub Override"</text></label>
+<bar><halpin>"ai_x_bar"</halpin><min_>0</min_><max_>1</max_></bar>
+<hbox>
+<bar>
+<size>50</size>
+<halpin>"spindle_rpm"</halpin>
+<text>"U/min"</text>
+<min_>0</min_>
+<max_>4500</max_>
+</bar>
+</hbox>
+<checkbutton><halpin>"break_z_axis"</halpin><text>"Open Break Z-Axis"</text></checkbutton>
+
+<hbox>
+<label><text>"Bus Count: "</text></label>
+<u32> 
+    <halpin>"bus_count_bar"</halpin>
+    <format>"d"</format>
+</u32>
+<label><text>"Bus Ready "</text></label>
+<led><halpin>"bus_state"</halpin><size>20</size><on_color>"green"</on_color><off_color>"red"</off_color></led>
+</hbox>
+<label><text>""</text></label>
+<button><halpin>"fault_rst_amps"</halpin><text>"Fehler Zurücksetzen"</text></button>
+<label><text>"AI Monitor"</text></label>
+<bar><halpin>"ai_bar"</halpin><min_>0</min_><max_>4</max_></bar>
+</pyvcp>
